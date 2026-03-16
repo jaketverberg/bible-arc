@@ -9,154 +9,231 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --paper:#f9f6f0;--rule:#d8d0c0;--ink:#1c1a16;--ink3:#8a8680;
+  --paper:#f8f5ef;--rule:#d0c8b4;--ink:#1c1a16;--ink2:#5a5650;--ink3:#9a9688;
   --gold:#b8963e;--gold2:#c9a848;
-  --c-coord:#3a72a8;--c-restate:#3d8050;--c-distinct:#b86e20;--c-contrary:#a83838;
-  --chrome:#161410;--border:#2e2c28;--sbg:#1e1c18;
+  --coord:#3a72a8;--restate:#3d8050;--distinct:#b86e20;--contrary:#a83838;
+  --chrome:#18160f;--border:#302e28;--sbg:#201e18;
   --serif:'EB Garamond',Georgia,serif;--ui:'Spectral',Georgia,serif;
-  --sw:270px;--hh:50px;
+  --sw:272px;--hh:48px;
 }
 html,body{height:100%;overflow:hidden}
 body{font-family:var(--serif);background:var(--chrome);color:var(--ink);display:flex;flex-direction:column}
 
-/* Header */
-header{height:var(--hh);flex-shrink:0;background:var(--chrome);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1rem;gap:.6rem}
-.logo{font-style:italic;color:var(--gold);font-size:1rem;font-weight:500;flex-shrink:0}
+/* ── Header ── */
+header{
+  height:var(--hh);flex-shrink:0;background:#111009;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 1rem;gap:.6rem;
+}
+.logo{font-style:italic;color:var(--gold);font-size:1rem;font-weight:500;flex-shrink:0;letter-spacing:.03em}
 .hrow{flex:1;min-width:0;display:flex;gap:5px;align-items:center}
-input.hi{flex:1;min-width:0;background:#28251f;border:1px solid #3e3c38;color:#e0dbd2;font-family:var(--ui);font-size:.83rem;padding:6px 9px;border-radius:4px;outline:none}
+input.hi{
+  flex:1;min-width:0;background:#1e1c16;border:1px solid #423e38;color:#ddd8cc;
+  font-family:var(--ui);font-size:.83rem;padding:6px 9px;border-radius:4px;outline:none;
+}
 input.hi:focus{border-color:var(--gold)}
-input.hi::placeholder{color:#4a4640}
-.hb{font-family:var(--ui);font-size:.76rem;padding:6px 12px;border-radius:4px;cursor:pointer;border:none;white-space:nowrap;background:var(--gold);color:#1a1810;font-weight:600}
+input.hi::placeholder{color:#504e48}
+.hb{font-family:var(--ui);font-size:.76rem;padding:6px 12px;border-radius:4px;cursor:pointer;border:none;white-space:nowrap;background:var(--gold);color:#110e08;font-weight:600}
 .hb:hover{background:var(--gold2)}.hb:disabled{opacity:.5;cursor:default}
-.hbg{background:transparent;border:1px solid #3e3c38;color:#9a9880;font-weight:400}
+.hbg{background:transparent;border:1px solid #423e38;color:#908878;font-weight:400}
 .hbg:hover{border-color:var(--gold);color:var(--gold)}
-.mbtn{display:none;background:none;border:1px solid #3e3c38;color:#9a9880;padding:5px 9px;border-radius:4px;cursor:pointer;font-size:1rem;flex-shrink:0}
-#mpill{font-family:var(--ui);font-size:.7rem;padding:3px 8px;border-radius:10px;flex-shrink:0;cursor:default;border:1px solid}
+.mbtn{display:none;background:none;border:1px solid #423e38;color:#908878;padding:5px 9px;border-radius:4px;cursor:pointer;font-size:1rem;flex-shrink:0}
+#mpill{font-family:var(--ui);font-size:.69rem;padding:3px 9px;border-radius:10px;flex-shrink:0;cursor:default;border:1px solid;white-space:nowrap}
 
-/* Body */
+/* ── Layout ── */
 .bwrap{flex:1;display:flex;min-height:0;overflow:hidden}
 
-/* Sidebar */
-.sidebar{width:var(--sw);flex-shrink:0;background:var(--sbg);border-right:1px solid var(--border);overflow-y:auto;padding:.8rem .75rem;display:flex;flex-direction:column;gap:.9rem}
-.slbl{font-family:var(--ui);font-size:.61rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#4a4640;padding-bottom:3px;border-bottom:1px solid var(--border);margin-bottom:1px}
-.ssec{display:flex;flex-direction:column;gap:.3rem}
-.rgg{margin-bottom:.45rem}
-.rgt{font-size:.61rem;font-style:italic;color:#4a4640;margin-bottom:3px}
+/* ── Sidebar ── */
+.sidebar{
+  width:var(--sw);flex-shrink:0;background:var(--sbg);
+  border-right:1px solid var(--border);
+  overflow-y:auto;padding:.9rem .85rem;display:flex;flex-direction:column;gap:1rem;
+}
+.ssec{display:flex;flex-direction:column;gap:.45rem}
+.slbl{
+  font-family:var(--ui);font-size:.68rem;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;color:#c8c0a8; /* Much brighter than before */
+  padding-bottom:4px;border-bottom:1px solid #3a3830;margin-bottom:2px;
+}
+.help{font-family:var(--ui);font-size:.75rem;color:#a09888;line-height:1.6}
+/* Relationship groups */
+.rgg{margin-bottom:.5rem}
+.rgt{
+  font-size:.68rem;font-style:italic;
+  color:#b0a898; /* Readable subtitle */
+  margin-bottom:4px;font-family:var(--ui);
+}
 .rgrid{display:flex;flex-wrap:wrap;gap:3px}
-.chip{font-family:var(--ui);font-size:.67rem;padding:3px 7px;border-radius:3px;cursor:pointer;border:1px solid transparent;transition:all .12s;user-select:none;font-weight:600}
-.chip:hover{transform:translateY(-1px);box-shadow:0 2px 5px rgba(0,0,0,.4)}
-.cc{background:#192538;color:#6aaae0;border-color:#253550}
-.cr{background:#182818;color:#6aaa78;border-color:#254030}
-.cd{background:#2a1e10;color:#d4904a;border-color:#453020}
-.cy{background:#281616;color:#d47070;border-color:#452020}
-.help{font-family:var(--ui);font-size:.71rem;color:#4a4640;line-height:1.55;font-style:italic}
-.arc-item{background:#252320;border:1px solid #3a3830;border-radius:3px;padding:5px 7px;display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:.7rem;color:#9a9880;font-family:var(--ui)}
+.chip{
+  font-family:var(--ui);font-size:.7rem;padding:4px 8px;border-radius:3px;
+  cursor:pointer;border:1px solid;transition:all .12s;user-select:none;font-weight:600;
+}
+.chip:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.5);filter:brightness(1.15)}
+/* Coordinate – blue */
+.cc{background:#1e3050;color:#90c0f0;border-color:#2e4870}
+/* Restate – green */
+.cr{background:#1a3020;color:#80c090;border-color:#2a4830}
+/* Distinct – amber */
+.cd{background:#342010;color:#e0a060;border-color:#504020}
+/* Contrary – red */
+.cy{background:#321418;color:#e08080;border-color:#502028}
+
+/* Bracket list items */
+.ai{
+  background:#282420;border:1px solid #403c38;border-radius:3px;
+  padding:5px 8px;display:flex;align-items:center;justify-content:space-between;
+  gap:4px;font-size:.72rem;color:#b0a898;font-family:var(--ui);
+}
 .adot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.adel{background:none;border:none;color:#4a4640;cursor:pointer;padding:1px 4px;font-size:.85rem;transition:color .12s}
-.adel:hover{color:#d47070}
-.bgrow{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.adel{background:none;border:none;color:#504c48;cursor:pointer;padding:1px 5px;font-size:.9rem;transition:color .12s}
+.adel:hover{color:#e08080}
+/* Flip button */
+.aflip{
+  background:none;border:1px solid #403c38;color:#808070;
+  cursor:pointer;padding:1px 5px;font-size:.68rem;border-radius:2px;
+  font-family:var(--ui);transition:all .12s;white-space:nowrap;
+}
+.aflip:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Background swatches */
+.bgrow{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:7px}
 .bgsw{width:20px;height:20px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all .12s}
 .bgsw.on{border-color:var(--gold)}.bgsw:hover{transform:scale(1.1)}
 input[type=color].bgsw{padding:0}
-.bfull{width:100%;font-family:var(--ui);font-size:.73rem;padding:6px;border-radius:3px;cursor:pointer;border:none;margin-top:3px}
-.bpri{background:var(--gold);color:#1a1810;font-weight:600}.bpri:hover{background:var(--gold2)}.bpri:disabled{opacity:.5}
-.bgho{background:transparent;border:1px solid #3e3c38;color:#9a9880}
-.bgho:hover{border-color:var(--gold);color:var(--gold)}
+.bfull{width:100%;font-family:var(--ui);font-size:.74rem;padding:6px 8px;border-radius:3px;cursor:pointer;border:none;margin-top:3px;text-align:left}
+.bpri{background:var(--gold);color:#110e08;font-weight:600}.bpri:hover{background:var(--gold2)}.bpri:disabled{opacity:.5}
+.bgho{background:transparent;border:1px solid #403c38;color:#a09888}.bgho:hover{border-color:var(--gold);color:var(--gold)}
 
-/* Canvas */
-.cwrap{flex:1;overflow:auto;background:#28251f;padding:1.25rem;display:flex;align-items:flex-start}
+/* ── Canvas ── */
+.cwrap{flex:1;overflow:auto;background:#242018;padding:1.25rem;display:flex;align-items:flex-start}
 
-/* Workspace */
-#ws{background:var(--paper);border-radius:2px;box-shadow:0 4px 32px rgba(0,0,0,.55);position:relative;min-width:280px;width:100%;max-width:860px}
-.wstop{padding:.8rem 1.25rem .65rem;border-bottom:1px solid var(--rule);display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem}
+/* ── Workspace (paper) ── */
+#ws{
+  background:var(--paper);border-radius:2px;
+  box-shadow:0 4px 36px rgba(0,0,0,.6);
+  position:relative;min-width:280px;width:100%;max-width:880px;
+}
+.wstop{
+  padding:.75rem 1.5rem .6rem;border-bottom:1px solid var(--rule);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;
+}
 .wsref{font-family:var(--serif);font-size:.9rem;font-weight:600;color:#5c4a2a}
-.wstr{font-family:var(--ui);font-size:.64rem;color:var(--ink3);font-style:italic;margin-top:1px}
+.wstr{font-family:var(--ui);font-size:.63rem;color:var(--ink3);font-style:italic;margin-top:1px}
 .wsacts{display:flex;gap:3px;flex-shrink:0}
-.wsb{font-family:var(--ui);font-size:.67rem;padding:3px 8px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--rule);color:var(--ink3)}
+.wsb{
+  font-family:var(--ui);font-size:.66rem;padding:3px 8px;border-radius:3px;
+  cursor:pointer;background:transparent;border:1px solid var(--rule);color:var(--ink3);
+}
 .wsb:hover{border-color:var(--gold);color:var(--gold)}
 
-/* Prop area */
-#pa{position:relative;padding:0;/* left-padding set dynamically */}
+/* ── Prop area ── */
+#pa{position:relative} /* left padding set dynamically */
 
-/* Each row — flex, align STARTS at top */
-.pr{display:flex;align-items:flex-start;position:relative;min-height:24px}
-.pr.sel .pti{background:rgba(184,150,62,.1);border-radius:2px}
+/* ── Each row ── */
+.pr{
+  display:flex;align-items:flex-start;
+  position:relative;cursor:pointer;
+}
+.pr:hover .pti{background:rgba(184,150,62,.06)}
+.pr.sel .pti{background:rgba(184,150,62,.13)}
 
-/* Verse number: tight, top-aligned */
-.vn{font-family:var(--ui);font-size:.63rem;color:var(--ink3);width:22px;flex-shrink:0;text-align:right;padding-right:5px;padding-top:3px;user-select:none;font-style:italic;line-height:1.75}
+/* Verse number — right-aligned, 28px wide */
+.vn{
+  font-family:var(--ui);font-size:.65rem;color:var(--ink3);
+  width:28px;flex-shrink:0;text-align:right;
+  padding-right:4px;padding-top:2px;
+  user-select:none;font-style:italic;line-height:1.7;
+}
+/* Sub-label (a,b,c) — tiny, right after vn */
+.vsub{
+  font-family:var(--ui);font-size:.58rem;color:#bbb;
+  width:12px;flex-shrink:0;
+  padding-top:3px;user-select:none;font-style:italic;line-height:1.7;
+}
 
-/* Verse sub-label (5a, 5b…) */
-.vsub{font-family:var(--ui);font-size:.6rem;color:#aaa;width:20px;flex-shrink:0;padding-right:3px;padding-top:3px;user-select:none;font-style:italic;text-align:left;line-height:1.75}
+/* Text column */
+.ptc{flex:1;min-width:0;padding:0 1.5rem 0 0}
+.pti{
+  font-family:var(--serif);font-size:1rem;line-height:1.7;
+  color:var(--ink);padding:1px 3px 1px 0;
+  border-radius:2px;word-break:break-word;
+  transition:background .1s;
+}
 
-/* Checkbox — top aligned */
-.cbw{width:17px;flex-shrink:0;padding-top:3px;display:flex;justify-content:center}
-.pcb{width:12px;height:12px;cursor:pointer;accent-color:var(--gold)}
+/* Inline split zones */
+.sz{display:inline;cursor:pointer}
+.sz:hover{color:#c83030}
+.sz:hover .sl{opacity:1}
+.sl{
+  display:inline-block;color:#c83030;font-weight:700;
+  opacity:0;transition:opacity .1s;user-select:none;
+  pointer-events:none;font-size:.85em;margin:0 1px;line-height:1;
+}
 
-/* Text */
-.ptc{flex:1;min-width:0;padding:0 1.25rem .1rem 0}
-.pti{font-family:var(--serif);font-size:1rem;line-height:1.75;color:var(--ink);padding:1px 2px;word-break:break-word}
-
-/* Split zones */
-.sz{display:inline;cursor:pointer}.sz:hover{color:#c03030}.sz:hover .sl{opacity:1}
-.sl{display:inline-block;color:#c83030;font-weight:700;opacity:0;transition:opacity .1s;user-select:none;pointer-events:none;font-size:.85em;line-height:1;margin:0 1px}
-
-/* Bracket SVG */
+/* ── SVG bracket layer ── */
 #bsvg{position:absolute;top:0;left:0;pointer-events:none;z-index:5;overflow:visible}
 
-/* States */
-.empty{padding:2.5rem 1.5rem;text-align:center;color:var(--ink3);font-family:var(--ui);font-size:.82rem;font-style:italic;line-height:1.8}
+/* ── States ── */
+.empty{
+  padding:2.5rem 1.5rem;text-align:center;color:var(--ink3);
+  font-family:var(--ui);font-size:.82rem;font-style:italic;line-height:1.8;
+}
 .loading{padding:1.5rem;display:flex;align-items:center;gap:8px;color:var(--ink3);font-family:var(--ui);font-size:.82rem}
 .spin{width:14px;height:14px;border:2px solid var(--rule);border-top-color:var(--gold);border-radius:50%;animation:spin .5s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ebox{margin:.5rem 1.25rem;background:#2a1616;border:1px solid #4a2222;color:#d47070;padding:6px 10px;border-radius:3px;font-size:.75rem;font-family:var(--ui)}
+.ebox{margin:.5rem 1.5rem;background:#2a1616;border:1px solid #4a2222;color:#e08080;padding:6px 10px;border-radius:3px;font-size:.75rem;font-family:var(--ui)}
 
-/* Key modal */
-.kmodal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:1rem}
-.kcard{background:#1e1c18;border:1px solid var(--border);border-radius:6px;padding:1.5rem;max-width:400px;width:100%;display:flex;flex-direction:column;gap:.85rem}
+/* ── Key modal ── */
+.kmodal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:1rem}
+.kcard{background:#1e1c16;border:1px solid var(--border);border-radius:6px;padding:1.5rem;max-width:400px;width:100%;display:flex;flex-direction:column;gap:.85rem}
 .ktitle{font-family:var(--serif);font-size:1.1rem;color:var(--gold);font-style:italic}
-.kdesc{font-family:var(--ui);font-size:.78rem;color:#9a9688;line-height:1.6}
+.kdesc{font-family:var(--ui);font-size:.78rem;color:#a09888;line-height:1.6}
 .kdesc a{color:var(--gold)}
-.kinp{background:#28251f;border:1px solid #4a4640;color:#e0dbd2;font-family:var(--ui);font-size:.85rem;padding:8px 12px;border-radius:4px;outline:none;width:100%}
+.kinp{background:#28251e;border:1px solid #504c48;color:#ddd8cc;font-family:var(--ui);font-size:.85rem;padding:8px 12px;border-radius:4px;outline:none;width:100%}
 .kinp:focus{border-color:var(--gold)}
 .krow{display:flex;gap:8px}
 .kb{flex:1;font-family:var(--ui);font-size:.8rem;padding:8px;border-radius:4px;cursor:pointer;border:none;font-weight:600}
-.kbp{background:var(--gold);color:#1a1810}.kbp:hover{background:var(--gold2)}
-.kbs{background:transparent;border:1px solid #4a4640;color:#9a9688}.kbs:hover{color:var(--gold);border-color:var(--gold)}
+.kbp{background:var(--gold);color:#110e08}.kbp:hover{background:var(--gold2)}
+.kbs{background:transparent;border:1px solid #504c48;color:#a09888}.kbs:hover{color:var(--gold);border-color:var(--gold)}
 
-/* Tooltip */
-.tt{position:fixed;background:#111;color:#e8e2d8;font-family:var(--ui);font-size:.7rem;padding:5px 9px;border-radius:3px;border:1px solid #3a3830;max-width:210px;line-height:1.5;pointer-events:none;z-index:9999;opacity:0;transition:opacity .08s}
+/* ── Tooltip ── */
+.tt{position:fixed;background:#0e0c08;color:#ddd8cc;font-family:var(--ui);font-size:.7rem;padding:5px 9px;border-radius:3px;border:1px solid #3e3a34;max-width:210px;line-height:1.5;pointer-events:none;z-index:9999;opacity:0;transition:opacity .08s}
 
-/* Mobile */
+/* ── Mobile ── */
 @media(max-width:680px){
   .mbtn{display:block}
-  .sidebar{position:fixed;bottom:0;left:0;right:0;top:auto;width:100%;max-height:65vh;border-right:none;border-top:1px solid var(--border);transform:translateY(100%);transition:transform .25s ease;z-index:100;border-radius:12px 12px 0 0}
-  .sidebar.open{transform:translateY(0)}
-  .drag{width:36px;height:4px;background:#3e3c38;border-radius:2px;margin:0 auto 10px;cursor:pointer}
-  .cwrap{padding:.75rem}
   .hbg{display:none}
-  .cbw{width:24px}.pcb{width:15px;height:15px}
+  .sidebar{
+    position:fixed;bottom:0;left:0;right:0;top:auto;width:100%;
+    max-height:66vh;border-right:none;border-top:1px solid var(--border);
+    transform:translateY(100%);transition:transform .25s ease;
+    z-index:100;border-radius:12px 12px 0 0;
+  }
+  .sidebar.open{transform:translateY(0)}
+  .drag{width:36px;height:4px;background:#403c38;border-radius:2px;margin:0 auto 10px;cursor:pointer}
+  .cwrap{padding:.75rem}
+  .pti{font-size:.95rem}
+  .cbw{width:24px}
 }
-@media(max-width:400px){
-  header{padding:0 .6rem;gap:.4rem}
-  .logo{font-size:.9rem}
-}
+@media(min-width:681px){.drag{display:none}}
+@media(max-width:400px){header{padding:0 .6rem;gap:.4rem}}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#3e3c38;border-radius:3px}
+::-webkit-scrollbar-thumb{background:#403c38;border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--gold)}
 </style>
 </head>
 <body>
 
-<!-- API Key Modal -->
+<!-- Key modal -->
 <div class="kmodal" id="kmodal">
   <div class="kcard">
     <div class="ktitle">ESV API Key</div>
-    <div class="kdesc">Enter your ESV API key to load passages. Get a free key at <a href="https://api.esv.org" target="_blank">api.esv.org</a>. Saved to your browser.</div>
+    <div class="kdesc">Enter your ESV API key. Get one free at <a href="https://api.esv.org" target="_blank">api.esv.org</a>. Saved to your browser.</div>
     <input class="kinp" id="kinp" type="text" placeholder="Paste your ESV API key…"/>
     <div class="krow">
       <button class="kb kbp" onclick="saveKey()">Save &amp; Continue</button>
-      <button class="kb kbs" onclick="skipKey()">Use Demo Mode</button>
+      <button class="kb kbs" onclick="skipKey()">Demo Mode</button>
     </div>
   </div>
 </div>
@@ -166,76 +243,111 @@ input[type=color].bgsw{padding:0}
   <div class="hrow">
     <input class="hi" id="vi" type="text" placeholder="e.g. Philippians 1:1-11" autocomplete="off" spellcheck="false"/>
     <button class="hb" id="lbtn" onclick="fetchVerse()">Load</button>
-    <button class="hb hbg" onclick="showKeyModal()" title="Change API key">Key</button>
+    <button class="hb hbg" onclick="showKeyModal()">Key</button>
   </div>
   <button class="mbtn" id="mbtn" onclick="toggleSB()">☰</button>
-  <span id="mpill" style="background:#192538;color:#6aaae0;border-color:#253550">Browse</span>
+  <span id="mpill" style="background:#1e3050;color:#90c0f0;border-color:#2e4870">Browse</span>
 </header>
 
 <div class="bwrap">
+<aside class="sidebar" id="sidebar">
+  <div class="drag" onclick="toggleSB()"></div>
 
-  <aside class="sidebar" id="sidebar">
-    <div class="drag" onclick="toggleSB()"></div>
-
-    <div class="ssec">
-      <div class="slbl">Instructions</div>
-      <div class="help" id="instr">1. Load a passage<br>2. Hover/tap between words to split<br>3. Check 2 propositions<br>4. Tap a relationship</div>
-    </div>
-
-    <div class="ssec">
-      <div class="slbl">Relationships</div>
-      <div class="rgg"><div class="rgt">Coordinate</div><div class="rgrid" id="rg-coord"></div></div>
-      <div class="rgg"><div class="rgt">Restatement</div><div class="rgrid" id="rg-restate"></div></div>
-      <div class="rgg"><div class="rgt">Distinct Statement</div><div class="rgrid" id="rg-distinct"></div></div>
-      <div class="rgg"><div class="rgt">Contrary Statement</div><div class="rgrid" id="rg-contrary"></div></div>
-    </div>
-
-    <div class="ssec">
-      <div class="slbl">Brackets</div>
-      <div id="alist"><div class="help">None yet.</div></div>
-    </div>
-
-    <div class="ssec">
-      <div class="slbl">Export</div>
-      <div class="help" style="margin-bottom:4px">Background</div>
-      <div class="bgrow">
-        <div class="bgsw on" id="bgsw-t" title="Transparent" style="background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px" onclick="setBg('t')"></div>
-        <div class="bgsw" id="bgsw-p" title="Paper" style="background:#f9f6f0" onclick="setBg('p')"></div>
-        <div class="bgsw" id="bgsw-w" title="White" style="background:#fff" onclick="setBg('w')"></div>
-        <div class="bgsw" id="bgsw-d" title="Dark" style="background:#1a1810" onclick="setBg('d')"></div>
-        <input type="color" class="bgsw" id="bgsw-c" value="#f9f6f0" title="Custom" onchange="setBg('c',this.value)">
-      </div>
-      <button class="bfull bpri" onclick="exportPNG()">Export PNG</button>
-      <button class="bfull bgho" onclick="undoSplit()">Undo last split</button>
-      <button class="bfull bgho" onclick="clearArcs()">Clear brackets</button>
-      <button class="bfull bgho" onclick="resetSplits()">Reset all splits</button>
-      <button class="bfull bgho" onclick="autoSplit()">Auto-split</button>
-    </div>
-  </aside>
-
-  <div class="cwrap" id="cwrap">
-    <div id="ws">
-      <div class="wstop" id="wstop" style="display:none">
-        <div><div class="wsref" id="wsref"></div><div class="wstr">English Standard Version</div></div>
-        <div class="wsacts">
-          <button class="wsb" onclick="undoSplit()" title="Undo last split">↩ Undo</button>
-          <button class="wsb" onclick="autoSplit()">Auto-split</button>
-        </div>
-      </div>
-      <div id="ebox"></div>
-      <div id="pa" style="position:relative">
-        <svg id="bsvg" xmlns="http://www.w3.org/2000/svg"></svg>
-        <div class="empty" id="emsg">Enter a reference above to begin.<br><span style="font-size:.75rem;opacity:.55">Romans 8:1-4 · Jude 20-21 · Philippians 1:3-11</span></div>
-      </div>
+  <div class="ssec">
+    <div class="slbl">Instructions</div>
+    <div class="help" id="instr">
+      1. Load a passage<br>
+      2. Hover between words → click <span style="color:#c83030;font-weight:700">/</span> to split<br>
+      3. Click a row to select (up to 2)<br>
+      4. Click a relationship to bracket
     </div>
   </div>
 
+  <div class="ssec">
+    <div class="slbl">Relationships</div>
+    <div class="rgg"><div class="rgt">Coordinate</div><div class="rgrid" id="rg-coord"></div></div>
+    <div class="rgg"><div class="rgt">Restatement</div><div class="rgrid" id="rg-restate"></div></div>
+    <div class="rgg"><div class="rgt">Distinct Statement</div><div class="rgrid" id="rg-distinct"></div></div>
+    <div class="rgg"><div class="rgt">Contrary Statement</div><div class="rgrid" id="rg-contrary"></div></div>
+    <div class="help" style="margin-top:4px;color:#807868">
+      <b style="color:#b0a898">Note:</b> To bracket a single verse as Ground/Inference, split it first so both sides of the relationship are separate propositions.
+    </div>
+  </div>
+
+  <div class="ssec">
+    <div class="slbl">Brackets</div>
+    <div id="alist"><div class="help" style="color:#707060">None yet.</div></div>
+  </div>
+
+  <div class="ssec">
+    <div class="slbl">Export</div>
+    <div class="help" style="margin-bottom:5px;color:#a09888">Background</div>
+    <div class="bgrow">
+      <div class="bgsw on" id="bgsw-t" title="Transparent" style="background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px" onclick="setBg('t')"></div>
+      <div class="bgsw" id="bgsw-p" title="Paper" style="background:#f8f5ef" onclick="setBg('p')"></div>
+      <div class="bgsw" id="bgsw-w" title="White" style="background:#fff" onclick="setBg('w')"></div>
+      <div class="bgsw" id="bgsw-d" title="Dark"  style="background:#18160f" onclick="setBg('d')"></div>
+      <input type="color" class="bgsw" id="bgsw-c" value="#f8f5ef" title="Custom" onchange="setBg('c',this.value)">
+    </div>
+    <button class="bfull bpri" onclick="exportPNG()">Export PNG</button>
+    <button class="bfull bgho" onclick="undoSplit()">↩ Undo last split</button>
+    <button class="bfull bgho" onclick="clearArcs()">Clear all brackets</button>
+    <button class="bfull bgho" onclick="resetSplits()">Reset all splits</button>
+    <button class="bfull bgho" onclick="autoSplit()">Auto-split sentences</button>
+  </div>
+</aside>
+
+<div class="cwrap" id="cwrap">
+  <div id="ws">
+    <div class="wstop" id="wstop" style="display:none">
+      <div>
+        <div class="wsref" id="wsref"></div>
+        <div class="wstr">English Standard Version</div>
+      </div>
+      <div class="wsacts">
+        <button class="wsb" onclick="undoSplit()">↩ Undo</button>
+        <button class="wsb" onclick="autoSplit()">Auto-split</button>
+      </div>
+    </div>
+    <div id="ebox"></div>
+    <div id="pa" style="position:relative">
+      <svg id="bsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="empty" id="emsg">
+        Enter a reference above to begin.<br>
+        <span style="font-size:.75rem;opacity:.5">Romans 8:1-4 · Jude 20-21 · Philippians 1:3-11</span>
+      </div>
+    </div>
+  </div>
 </div>
+</div>
+
 <div class="tt" id="tt"></div>
 
 <script>
-// ─── Relationship data ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// RELATIONSHIP DATA
+// ═══════════════════════════════════════════════════════════════
 const CAT_COLOR={coord:'#3a72a8',restate:'#3d8050',distinct:'#b86e20',contrary:'#a83838'};
+
+// Relationships that have a meaningful "flip" (which side is which)
+const FLIPPABLE=new Set(['G','∴','Ac/Res','Ac/Pur','If/Th','T','L','Ac/Mn','-/+','Id/Exp','Cf','Sit/R','Csv']);
+// Label pairs for flippable relationships: [default, flipped]
+const FLIP_LABELS={
+  'G':       ['G','G'],         // same code, order swaps meaning
+  '∴':       ['∴','∴'],
+  'Ac/Res':  ['Ac','Res'],      // show which side is which
+  'Ac/Pur':  ['Ac','Pur'],
+  'If/Th':   ['If','Th'],
+  'T':       ['T','T'],
+  'L':       ['L','L'],
+  'Ac/Mn':   ['Ac','Mn'],
+  '-/+':     ['−','+'],
+  'Id/Exp':  ['Id','Exp'],
+  'Cf':      ['Cf','Cf'],
+  'Sit/R':   ['Sit','R'],
+  'Csv':     ['Csv','Csv'],
+};
+
 const RELS={
   coord:[
     {code:'S',  name:'Series',           cat:'coord',   desc:'Each proposition makes its own independent contribution to a whole.'},
@@ -243,19 +355,19 @@ const RELS={
     {code:'A',  name:'Alternative',      cat:'coord',   desc:'Each proposition expresses a different possibility arising from a situation.'},
   ],
   restate:[
-    {code:'Ac/Mn', name:'Action-Manner',    cat:'restate', desc:'An action and the way or manner that action is carried out. Can also indicate means.'},
-    {code:'Cf',    name:'Comparison',       cat:'restate', desc:'An action and a statement that clarifies it by showing what it is like.'},
-    {code:'-/+',   name:'Neg–Positive',     cat:'restate', desc:'Two statements, one denied so the other is enforced.'},
+    {code:'Ac/Mn', name:'Action-Manner',    cat:'restate', desc:'An action and the way/manner it is carried out, or the means.'},
+    {code:'Cf',    name:'Comparison',       cat:'restate', desc:'An action and a statement clarifying it by showing what it is like.'},
+    {code:'-/+',   name:'Neg–Positive',     cat:'restate', desc:'One statement denied so the other is enforced.'},
     {code:'Id/Exp',name:'Idea-Explanation', cat:'restate', desc:'An original statement and one clarifying its meaning.'},
     {code:'Q/A',   name:'Question-Answer',  cat:'restate', desc:'The statement of a question and its answer.'},
   ],
   distinct:[
-    {code:'G',     name:'Ground',           cat:'distinct',desc:'A statement and the argument/reason for it (reason follows).'},
+    {code:'G',     name:'Ground',           cat:'distinct',desc:'A statement and the argument/reason for it (reason follows the main claim).'},
     {code:'∴',     name:'Inference',        cat:'distinct',desc:'A statement and the reason for it (reason precedes). Conjunctions: therefore, accordingly.'},
     {code:'BL',    name:'Bilateral',        cat:'distinct',desc:'A proposition supporting one preceding and one following proposition.'},
     {code:'Ac/Res',name:'Action-Result',    cat:'distinct',desc:'An action and a consequence or result which accompanies it.'},
     {code:'Ac/Pur',name:'Action-Purpose',   cat:'distinct',desc:'An action and its intended result. Conjunctions: in order that, so that, lest.'},
-    {code:'If/Th', name:'Conditional',      cat:'distinct',desc:'Like Action-Result but the action is only potential; result is contingent on it.'},
+    {code:'If/Th', name:'Conditional',      cat:'distinct',desc:'Like Action-Result but the action is only potential.'},
     {code:'T',     name:'Temporal',         cat:'distinct',desc:'A statement and the occasion when it is true or can occur.'},
     {code:'L',     name:'Locative',         cat:'distinct',desc:'A statement and the place where it is true or can occur.'},
   ],
@@ -266,18 +378,18 @@ const RELS={
 };
 const RBC={};Object.values(RELS).flat().forEach(r=>RBC[r.code]=r);
 
-// ─── State ───────────────────────────────────────────────────────────────────
-// Each prop: { id, text, verseNum, subLabel }
-// subLabel: '' for unsplit verses, 'a','b',... for splits
-// splitHistory: stack of snapshots for undo
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
 let props=[], brackets=[], selected=[];
 let nextBId=1, nextPId=0;
-let rawVerses=null, currentRef='';
-let splitHistory=[];   // array of props snapshots
+let rawVerses=null, currentRef='', esvKey='';
+let splitHistory=[];
 let exportBg='t', exportBgColor=null;
-let esvKey='';
 
-// ─── Init ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
   esvKey=localStorage.getItem('esv_key')||'';
   if(esvKey) document.getElementById('kmodal').style.display='none';
@@ -286,17 +398,17 @@ document.addEventListener('DOMContentLoaded',()=>{
   new ResizeObserver(()=>renderBrackets()).observe(document.getElementById('ws'));
 });
 
-// ─── Key modal ───────────────────────────────────────────────────────────────
 function saveKey(){
   const v=document.getElementById('kinp').value.trim();
-  if(!v){alert('Please enter an API key');return}
-  esvKey=v; localStorage.setItem('esv_key',v);
+  if(!v){alert('Please enter a key.');return}
+  esvKey=v;localStorage.setItem('esv_key',v);
   document.getElementById('kmodal').style.display='none';
 }
 function skipKey(){esvKey='TEST';document.getElementById('kmodal').style.display='none'}
 function showKeyModal(){document.getElementById('kinp').value=esvKey;document.getElementById('kmodal').style.display='flex'}
+function toggleSB(){document.getElementById('sidebar').classList.toggle('open')}
+function closeSB(){document.getElementById('sidebar').classList.remove('open')}
 
-// ─── Palette ─────────────────────────────────────────────────────────────────
 function buildPalette(){
   [{key:'coord',el:'rg-coord',cls:'cc'},{key:'restate',el:'rg-restate',cls:'cr'},
    {key:'distinct',el:'rg-distinct',cls:'cd'},{key:'contrary',el:'rg-contrary',cls:'cy'}
@@ -313,48 +425,40 @@ function buildPalette(){
   });
 }
 
-// ─── Sidebar (mobile) ────────────────────────────────────────────────────────
-function toggleSB(){document.getElementById('sidebar').classList.toggle('open')}
-function closeSB(){document.getElementById('sidebar').classList.remove('open')}
-
-// ─── ESV API ─────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// ESV API
+// ═══════════════════════════════════════════════════════════════
 async function fetchVerse(){
   const ref=document.getElementById('vi').value.trim();
   if(!ref)return;
   if(!esvKey){showKeyModal();return}
-  currentRef=ref; showLoading();
+  currentRef=ref;showLoading();
   try{
     const params=new URLSearchParams({
-      q:ref,
-      'include-headings':'false','include-footnotes':'false',
+      q:ref,'include-headings':'false','include-footnotes':'false',
       'include-verse-numbers':'true','include-short-copyright':'false',
       'include-passage-references':'false','indent-paragraphs':'0',
-      'indent-poetry':'false','indent-using':'spaces',
-      'line-length':'0',
+      'indent-poetry':'false','indent-using':'spaces','line-length':'0',
     });
     const url=`https://api.esv.org/v3/passage/text/?${params}`;
     let data;
     try{
       const r=await fetch(url,{headers:{Authorization:`Token ${esvKey}`}});
-      if(!r.ok) throw new Error(`ESV API responded with status ${r.status}`);
+      if(!r.ok) throw new Error(`ESV API error ${r.status}`);
       data=await r.json();
-    }catch(e){
-      // CORS proxy fallback (local file:// usage)
+    }catch{
       const r2=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
-      if(!r2.ok) throw new Error('Could not reach ESV API. Check your key and network.');
+      if(!r2.ok) throw new Error('Cannot reach ESV API. Check key & connection.');
       data=await r2.json();
     }
     if(!data.passages||!data.passages[0]) throw new Error('No passage found for: '+ref);
     const verses=parseESV(data.passages[0]);
     if(!verses.length) throw new Error('Could not parse passage text.');
-    rawVerses=verses;
-    setupProps(ref,verses);
-    clearErr();
+    rawVerses=verses;setupProps(ref,verses);clearErr();
   }catch(e){showErr(e.message);showEmpty()}
 }
 
 function parseESV(text){
-  // ESV returns text with inline [N] verse markers
   const cleaned=text.replace(/\s+/g,' ').trim();
   const parts=cleaned.split(/\[(\d+)\]/);
   const out=[];
@@ -366,66 +470,54 @@ function parseESV(text){
   return out;
 }
 
-// ─── Setup propositions ──────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// SETUP
+// ═══════════════════════════════════════════════════════════════
 function setupProps(ref,verses){
-  nextPId=0; selected=[]; brackets=[]; splitHistory=[];
+  nextPId=0;selected=[];brackets=[];splitHistory=[];
   props=verses.map(v=>({id:++nextPId,text:v.text,verseNum:v.verse,subLabel:''}));
   document.getElementById('wstop').style.display='flex';
   document.getElementById('wsref').textContent=ref;
   document.getElementById('emsg').style.display='none';
-  renderAll(); updateAList(); setMode('browse');
+  renderAll();updateAList();updateMode();
 }
 
-// ─── Sub-label system: a,b,c...z ─────────────────────────────────────────────
-// Given a verseNum, find all props with that verseNum and assign a,b,c...
-// A verse with no splits has subLabel=''. After first split: 'a','b'.
-// Further splits produce 'a','b','c' etc. on that verse.
+// ═══════════════════════════════════════════════════════════════
+// SUB-LABELS  (a, b, c … z)
+// ═══════════════════════════════════════════════════════════════
 function recomputeSubLabels(){
-  const byVerse={};
-  props.forEach(p=>{
-    if(!byVerse[p.verseNum]) byVerse[p.verseNum]=[];
-    byVerse[p.verseNum].push(p);
-  });
-  Object.values(byVerse).forEach(group=>{
-    if(group.length===1){
-      group[0].subLabel='';
-    }else{
-      group.forEach((p,i)=>{
-        // a=0, b=1, ... z=25
-        p.subLabel=String.fromCharCode(97+i);
-      });
-    }
+  const byV={};
+  props.forEach(p=>{(byV[p.verseNum]||(byV[p.verseNum]=[])).push(p)});
+  Object.values(byV).forEach(g=>{
+    if(g.length===1){g[0].subLabel=''}
+    else g.forEach((p,i)=>p.subLabel=String.fromCharCode(97+i));
   });
 }
 
-// ─── Split ───────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// SPLIT / UNDO / RESET
+// ═══════════════════════════════════════════════════════════════
 function splitAt(propId,wordIdx){
   const i=props.findIndex(p=>p.id===propId);
   if(i<0)return;
   const p=props[i];
   const words=p.text.split(' ');
   if(wordIdx<1||wordIdx>=words.length)return;
-  // Save snapshot for undo
-  splitHistory.push(props.map(p=>({...p})));
-  const L=words.slice(0,wordIdx).join(' ');
-  const R=words.slice(wordIdx).join(' ');
+  splitHistory.push(props.map(q=>({...q})));
   props.splice(i,1,
-    {id:++nextPId,text:L,verseNum:p.verseNum,subLabel:''},
-    {id:++nextPId,text:R,verseNum:p.verseNum,subLabel:''}
+    {id:++nextPId,text:words.slice(0,wordIdx).join(' '),verseNum:p.verseNum,subLabel:''},
+    {id:++nextPId,text:words.slice(wordIdx).join(' '), verseNum:p.verseNum,subLabel:''}
   );
   brackets=brackets.filter(b=>b.from!==propId&&b.to!==propId);
-  recomputeSubLabels();
-  renderAll(); updateAList();
+  recomputeSubLabels();renderAll();updateAList();
 }
 
 function undoSplit(){
   if(!splitHistory.length){flashInstr('Nothing to undo.');return}
   props=splitHistory.pop();
-  // Remove brackets referencing ids that no longer exist
   const ids=new Set(props.map(p=>p.id));
   brackets=brackets.filter(b=>ids.has(b.from)&&ids.has(b.to));
-  recomputeSubLabels();
-  renderAll(); updateAList();
+  recomputeSubLabels();renderAll();updateAList();
 }
 
 function autoSplit(){
@@ -437,9 +529,7 @@ function autoSplit(){
     if(parts.length<=1){next.push({...p});return}
     parts.forEach(t=>next.push({id:++nextPId,text:t,verseNum:p.verseNum,subLabel:''}));
   });
-  props=next; brackets=[];
-  recomputeSubLabels();
-  renderAll(); updateAList();
+  props=next;brackets=[];recomputeSubLabels();renderAll();updateAList();
 }
 
 function smartSplit(text){
@@ -452,12 +542,11 @@ function smartSplit(text){
   return parts.map(s=>s.trim()).filter(Boolean);
 }
 
-function resetSplits(){
-  if(!rawVerses)return;
-  setupProps(currentRef,rawVerses);
-}
+function resetSplits(){if(!rawVerses)return;setupProps(currentRef,rawVerses)}
 
-// ─── Selection ───────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// SELECTION  (click row, no checkbox)
+// ═══════════════════════════════════════════════════════════════
 function toggleSel(id){
   const i=selected.indexOf(id);
   if(i>=0) selected.splice(i,1);
@@ -465,8 +554,6 @@ function toggleSel(id){
   document.querySelectorAll('.pr').forEach(row=>{
     const pid=parseInt(row.dataset.pid);
     row.classList.toggle('sel',selected.includes(pid));
-    const cb=row.querySelector('.pcb');
-    if(cb)cb.checked=selected.includes(pid);
   });
   updateMode();
 }
@@ -474,45 +561,59 @@ function toggleSel(id){
 function updateMode(){
   const pill=document.getElementById('mpill');
   const instr=document.getElementById('instr');
-  if(selected.length===0){
-    pill.style.cssText='background:#192538;color:#6aaae0;border-color:#253550';pill.textContent='Browse';
-    instr.innerHTML='1. Hover between words to split<br>2. Check 2 propositions<br>3. Tap a relationship';
-  }else if(selected.length===1){
-    pill.style.cssText='background:#2a1e10;color:#d4904a;border-color:#453020';pill.textContent='1 of 2';
-    instr.innerHTML='<span style="color:var(--gold)">1 selected.</span><br>Select a second proposition.';
+  const n=selected.length;
+  if(n===0){
+    pill.style.cssText='background:#1e3050;color:#90c0f0;border-color:#2e4870';pill.textContent='Browse';
+    instr.innerHTML='1. Hover between words → click <span style="color:#c83030;font-weight:700">/</span> to split<br>2. Click a row to select (up to 2)<br>3. Click a relationship to bracket';
+  }else if(n===1){
+    pill.style.cssText='background:#342010;color:#e0a060;border-color:#504020';pill.textContent='1 of 2 selected';
+    instr.innerHTML='<span style="color:var(--gold)">1 selected.</span><br>Click a second proposition.';
   }else{
-    pill.style.cssText='background:#182818;color:#6aaa78;border-color:#254030';pill.textContent='Ready';
-    instr.innerHTML='<span style="color:var(--gold)">2 selected.</span><br>Tap a relationship.';
+    pill.style.cssText='background:#1a3020;color:#80c090;border-color:#2a4830';pill.textContent='Ready to bracket';
+    instr.innerHTML='<span style="color:var(--gold)">2 selected.</span><br>Click a relationship below.';
   }
 }
-function setMode(){updateMode()}
-
 function flashInstr(msg){
-  const el=document.getElementById('instr');
-  const old=el.innerHTML;
-  el.innerHTML=`<span style="color:#d4a060">${msg}</span>`;
-  setTimeout(()=>el.innerHTML=old,2000);
+  const el=document.getElementById('instr'),old=el.innerHTML;
+  el.innerHTML=`<span style="color:#e0a060">${msg}</span>`;
+  setTimeout(()=>el.innerHTML=old,2200);
 }
 
-// ─── Apply bracket ───────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// APPLY BRACKET
+// ═══════════════════════════════════════════════════════════════
 function applyBracket(code){
-  if(selected.length!==2){flashInstr('Select 2 propositions first.');return}
+  if(selected.length!==2){flashInstr('Select exactly 2 propositions first.');return}
   const rel=RBC[code];if(!rel)return;
-  brackets.push({id:nextBId++,from:selected[0],to:selected[1],code,color:CAT_COLOR[rel.cat]});
-  selected=[];
-  renderAll(); updateAList(); setMode();
+  brackets.push({
+    id:nextBId++,from:selected[0],to:selected[1],
+    code,color:CAT_COLOR[rel.cat],flipped:false
+  });
+  selected=[];renderAll();updateAList();updateMode();
   if(window.innerWidth<=680){
     const sb=document.getElementById('sidebar');
-    sb.classList.add('open');setTimeout(()=>sb.classList.remove('open'),1400);
+    sb.classList.add('open');setTimeout(()=>sb.classList.remove('open'),1500);
   }
 }
 function deleteB(id){brackets=brackets.filter(b=>b.id!==id);renderAll();updateAList()}
-function clearArcs(){brackets=[];selected=[];renderAll();updateAList();setMode()}
+function flipB(id){
+  const b=brackets.find(b=>b.id===id);
+  if(b){b.flipped=!b.flipped;[b.from,b.to]=[b.to,b.from]}
+  renderAll();updateAList();
+}
+function clearArcs(){brackets=[];selected=[];renderAll();updateAList();updateMode()}
 
-// ─── Render ──────────────────────────────────────────────────────────────────
-function renderAll(){renderProps();requestAnimationFrame(()=>requestAnimationFrame(renderBrackets))}
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderAll(){
+  renderProps();
+  requestAnimationFrame(()=>requestAnimationFrame(renderBrackets));
+}
 
-// ─── Render propositions ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// RENDER PROPOSITIONS
+// ═══════════════════════════════════════════════════════════════
 function renderProps(){
   const area=document.getElementById('pa');
   const svg=document.getElementById('bsvg');
@@ -526,25 +627,20 @@ function renderProps(){
     const row=document.createElement('div');
     row.className='pr'+(selected.includes(p.id)?' sel':'');
     row.dataset.pid=p.id;
+    // Click row to select (not a checkbox)
+    row.addEventListener('click',e=>{
+      if(e.target.classList.contains('sz')||e.target.classList.contains('sl'))return;
+      toggleSel(p.id);
+    });
 
-    // Verse number column — show number only when verse changes
-    const vn=document.createElement('div');
-    vn.className='vn';
+    // Verse number
+    const vn=document.createElement('div');vn.className='vn';
     vn.textContent=(p.verseNum!==lastV)?p.verseNum:'';
     lastV=p.verseNum;
 
-    // Sub-label column (a, b, c…)
-    const vs=document.createElement('div');
-    vs.className='vsub';
+    // Sub-label
+    const vs=document.createElement('div');vs.className='vsub';
     vs.textContent=p.subLabel||'';
-
-    // Checkbox
-    const cbw=document.createElement('div');cbw.className='cbw';
-    const cb=document.createElement('input');cb.type='checkbox';cb.className='pcb';
-    cb.checked=selected.includes(p.id);
-    cb.addEventListener('change',()=>toggleSel(p.id));
-    cb.addEventListener('click',e=>e.stopPropagation());
-    cbw.appendChild(cb);
 
     // Text
     const ptc=document.createElement('div');ptc.className='ptc';
@@ -552,7 +648,7 @@ function renderProps(){
     buildWordSpans(ti,p);
     ptc.appendChild(ti);
 
-    row.appendChild(vn);row.appendChild(vs);row.appendChild(cbw);row.appendChild(ptc);
+    row.appendChild(vn);row.appendChild(vs);row.appendChild(ptc);
     area.appendChild(row);
   });
 }
@@ -571,53 +667,56 @@ function buildWordSpans(container,prop){
   });
 }
 
-// ─── Render brackets ─────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// BRACKET RENDERING — connected tree
+// ═══════════════════════════════════════════════════════════════
 //
-// Layout:
-//   [col N-1]...[col 1][col 0] | [vnum][vsub][cb] | text text text
+// Layout (matches biblearc closely):
 //
-// col 0 = innermost (closest to text)
-// col N = outermost (farthest left)
-// Each col is COL_W px wide.
-// The bracket stem is at the RIGHT edge of its column slot.
-// Tick extends RIGHT toward the text.
-// Label sits LEFT of the stem within its column slot.
+//   [col N] ... [col 1][col 0] | [vnum][sub] | text text text
 //
-// Key fix: anchor y at TOP of row (offsetTop), not middle.
-// This ensures multi-line rows bracket from the top of the first line.
+// Key rules:
+//  1. col 0 = innermost (rightmost), col N = outermost (leftmost)
+//  2. Each bracket's TICK (horizontal line at top/bottom) points RIGHT
+//     and its RIGHT endpoint lands exactly on the STEM of the next
+//     inner bracket that overlaps at that y-position.
+//     If no inner bracket overlaps, it terminates with a short tick.
+//  3. Label sits LEFT of each stem, very compact (~16px wide slot)
+//  4. Stems are black/dark; labels are colored
+//  5. Small × circle at each tick endpoint for delete
+//  6. Bracket anchors at TOP of first row, BOTTOM of last row
 //
-const COL_W=22;   // px per bracket column
-const TICK=6;     // tick length toward text
-const COL_GAP=2;  // gap between rightmost bracket and vnum column
-// Left of text content = bracketZoneW + COL_GAP + VNUM_W + VSUB_W + CB_W + INNER_PAD
-const VNUM_W=22, VSUB_W=20, CB_W=17, INNER_PAD=2;
+const CW=18;   // column width (pixels) — very tight like biblearc
+const TICK_MAX=6; // max tick length (extends right to parent stem)
+const COL_GAP=4;  // gap between rightmost bracket col and vnum
+const VN_W=28;    // verse number column
+const VS_W=12;    // sub-label column
+const INNER_PAD=4;// tiny pad between sub-label and text
 
-let _bd=[];
+let _bdata=[];
 
 function computeCols(){
   const area=document.getElementById('pa');
-  _bd=brackets.map(b=>{
+  _bdata=brackets.map(b=>{
     const fr=area.querySelector(`.pr[data-pid="${b.from}"]`);
     const to=area.querySelector(`.pr[data-pid="${b.to}"]`);
     if(!fr||!to)return null;
-    // Use TOP of row for y anchor (multi-line text alignment)
     const y1=fr.offsetTop;
     const y2=to.offsetTop+to.offsetHeight;
     return{b,y1,y2,col:0};
   }).filter(Boolean);
-
-  // Largest spans → outermost (highest col index)
-  _bd.sort((a,b)=>(b.y2-b.y1)-(a.y2-a.y1));
-  _bd.forEach((cur,i)=>{
+  // Sort: largest spans → outermost (largest col)
+  _bdata.sort((a,b)=>(b.y2-b.y1)-(a.y2-a.y1));
+  _bdata.forEach((cur,i)=>{
     const used=new Set();
     for(let j=0;j<i;j++){
-      const o=_bd[j];
+      const o=_bdata[j];
       if(cur.y1<o.y2-1&&cur.y2>o.y1+1)used.add(o.col);
     }
     let c=0;while(used.has(c))c++;
     cur.col=c;
   });
-  return _bd.reduce((m,d)=>Math.max(m,d?d.col+1:0),0);
+  return _bdata.reduce((m,d)=>Math.max(m,d?d.col+1:0),0);
 }
 
 function renderBrackets(){
@@ -626,14 +725,15 @@ function renderBrackets(){
   svg.innerHTML='';
 
   if(!props.length){
-    area.style.paddingLeft=(VNUM_W+VSUB_W+CB_W+INNER_PAD)+'px';
+    area.style.paddingLeft=(VN_W+VS_W+INNER_PAD)+'px';
     svg.style.width='0';svg.style.height='0';
     return;
   }
 
   const nCols=computeCols();
-  const bZoneW=nCols>0?nCols*COL_W+COL_GAP:COL_GAP;
-  const leftPad=bZoneW+VNUM_W+VSUB_W+CB_W+INNER_PAD;
+  // Total bracket zone width
+  const bZW=nCols>0?nCols*CW+COL_GAP:COL_GAP;
+  const leftPad=bZW+VN_W+VS_W+INNER_PAD;
 
   area.style.paddingLeft=leftPad+'px';
   void area.offsetHeight; // force reflow
@@ -644,97 +744,146 @@ function renderBrackets(){
   svg.style.height=svgH+'px';
   svg.setAttribute('viewBox',`0 0 ${svgW} ${svgH}`);
 
-  _bd.forEach(d=>{
+  // Build stem x lookup: col → stemX within SVG
+  // col 0 (innermost): stemX = bZW - COL_GAP - 1
+  // col 1: stemX = bZW - COL_GAP - 1 - CW
+  // col N: stemX = bZW - COL_GAP - 1 - N*CW
+  const stemX=col=>bZW-COL_GAP-1-col*CW;
+
+  // For each bracket, find which column its ticks should extend TO
+  // (i.e., the nearest inner bracket that covers the same tick y)
+  function tickEndX(col,y){
+    // Find inner brackets (smaller col) that cover y
+    let innerCol=-1;
+    for(const d of _bdata){
+      if(d.col<col&&d.y1<=y+2&&d.y2>=y-2){
+        if(d.col>innerCol)innerCol=d.col;
+      }
+    }
+    if(innerCol>=0) return stemX(innerCol);
+    // No inner bracket — short tick toward text
+    return stemX(col)+TICK_MAX;
+  }
+
+  _bdata.forEach(d=>{
     if(!d)return;
-    const{b,col}=d;
+    const{b,col,y1,y2}=d;
     const fr=area.querySelector(`.pr[data-pid="${b.from}"]`);
     const to=area.querySelector(`.pr[data-pid="${b.to}"]`);
     if(!fr||!to)return;
 
-    // y1 = top of first row, y2 = bottom of last row
-    const y1=fr.offsetTop+2;       // +2px top inset
-    const y2=to.offsetTop+to.offsetHeight-2; // -2px bottom inset
-    const mid=(y1+y2)/2;
+    // Re-read y positions after padding update
+    const ry1=fr.offsetTop+1;
+    const ry2=to.offsetTop+to.offsetHeight-1;
+    const mid=(ry1+ry2)/2;
+    const sx=stemX(col);
 
-    // Stem x within the SVG coordinate space:
-    // The rightmost bracket (col 0) has its stem at x = bZoneW - COL_GAP - (0+0.5)*COL_W... no.
-    // Simpler: col 0 stem is at bZoneW - COL_GAP - 1 (right edge of bracket zone, 1px from gap)
-    // col 1 stem is one column width to the left, etc.
-    const stemX=bZoneW-COL_GAP-1-col*COL_W;
+    // Tick endpoints
+    const txTop=tickEndX(col,ry1);
+    const txBot=tickEndX(col,ry2);
 
-    const lbl=b.code;
-    const lcolor=b.color;  // label color only
-    const stemColor='#555550'; // all stems are dark neutral
+    const stemCol='#3a3830';
+    const sw=1.4;
 
-    // ── Vertical stem ──
-    line(svg,stemX,y1,stemX,y2,stemColor,1.5);
+    // Vertical stem
+    svgLine(svg,sx,ry1,sx,ry2,stemCol,sw);
+    // Top tick
+    svgLine(svg,sx,ry1,txTop,ry1,stemCol,sw);
+    // Bottom tick
+    svgLine(svg,sx,ry2,txBot,ry2,stemCol,sw);
 
-    // ── Top tick → ──
-    line(svg,stemX,y1,stemX+TICK,y1,stemColor,1.5);
+    // Label: colored, inside the col slot, left of stem
+    // Available width = CW - 2px (leave 1px each side of stem)
+    const lblW=CW-2;
+    const lblH=13;
+    const lblX=sx-lblW-1; // label sits immediately left of stem
+    const lblY=mid-lblH/2;
 
-    // ── Bottom tick → ──
-    line(svg,stemX,y2,stemX+TICK,y2,stemColor,1.5);
+    const lbl=getBracketLabel(b);
+    const lc=b.color;
 
-    // ── Label: inside the column, left of stem, colored ──
-    const fw=Math.max(14,lbl.length*5.4+7), fh=13;
-    const lx=stemX-3; // right edge of label area
+    // Colored background pill
+    svgRect(svg,lblX,lblY,lblW,lblH,lc+'1c',lc+'55',2);
 
-    // Clip label to stay within SVG (don't go below x=0)
-    const lLeft=Math.max(1,lx-fw);
-    const actualFw=lx-lLeft;
-
-    // Background tinted with label color
-    rect(svg,lLeft,mid-fh/2,actualFw,fh,lcolor+'14',lcolor+'44',2);
-
-    const t=mkText(svg,lLeft+actualFw/2,mid,lbl,lcolor,8.5);
+    // Label text
+    const t=svgText(svg,lblX+lblW/2,mid,lbl,lc,8.5);
     t.setAttribute('font-weight','700');
     t.setAttribute('font-style','italic');
+    t.setAttribute('font-family','Georgia,serif');
   });
 }
 
-function line(svg,x1,y1,x2,y2,stroke,sw){
+function getBracketLabel(b){
+  if(!FLIPPABLE.has(b.code)) return b.code;
+  const pair=FLIP_LABELS[b.code];
+  if(!pair) return b.code;
+  // When flipped, show the "second" label; else the code itself
+  return b.code; // The bracket list shows the split labels; here we show the code
+}
+
+// ── SVG helpers ──────────────────────────────────────────────
+function svgLine(svg,x1,y1,x2,y2,stroke,sw){
   const l=document.createElementNS('http://www.w3.org/2000/svg','line');
   l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
   l.setAttribute('stroke',stroke);l.setAttribute('stroke-width',sw);l.setAttribute('stroke-linecap','round');
-  svg.appendChild(l);
+  svg.appendChild(l);return l;
 }
-function rect(svg,x,y,w,h,fill,stroke,rx){
+function svgRect(svg,x,y,w,h,fill,stroke,rx){
+  if(w<=0||h<=0)return;
   const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
   r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);
   r.setAttribute('fill',fill);r.setAttribute('stroke',stroke);r.setAttribute('stroke-width','0.7');r.setAttribute('rx',rx);
-  svg.appendChild(r);
+  svg.appendChild(r);return r;
 }
-function mkText(svg,x,y,txt,fill,size){
+function svgText(svg,x,y,txt,fill,size){
   const t=document.createElementNS('http://www.w3.org/2000/svg','text');
   t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('text-anchor','middle');
-  t.setAttribute('dominant-baseline','central');t.setAttribute('fill',fill);
-  t.setAttribute('font-size',size);t.setAttribute('font-family','Georgia,serif');
+  t.setAttribute('dominant-baseline','central');t.setAttribute('fill',fill);t.setAttribute('font-size',size);
   t.textContent=txt;svg.appendChild(t);return t;
 }
 
-// ─── Bracket list ────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// BRACKET LIST
+// ═══════════════════════════════════════════════════════════════
 function updateAList(){
   const el=document.getElementById('alist');
-  if(!brackets.length){el.innerHTML='<div class="help">None yet.</div>';return}
+  if(!brackets.length){el.innerHTML='<div class="help" style="color:#707060">None yet.</div>';return}
   el.innerHTML='';
   [...brackets].reverse().forEach(b=>{
     const fp=props.find(p=>p.id===b.from);
     const tp=props.find(p=>p.id===b.to);
-    const fLabel=fp?(fp.verseNum+(fp.subLabel||'')):'?';
-    const tLabel=tp?(tp.verseNum+(tp.subLabel||'')):'?';
-    const item=document.createElement('div');item.className='arc-item';
+    const fl=fp?(fp.verseNum+(fp.subLabel||'')):'?';
+    const tl=tp?(tp.verseNum+(tp.subLabel||'')):'?';
+    const rel=RBC[b.code];
+    const canFlip=FLIPPABLE.has(b.code);
+
+    // For dual-label relationships, show which is which
+    let lbl=b.code;
+    if(canFlip&&FLIP_LABELS[b.code]&&FLIP_LABELS[b.code][0]!==FLIP_LABELS[b.code][1]){
+      const [la,lb]=FLIP_LABELS[b.code];
+      lbl=`<span style="color:${b.color}">${la}</span><span style="color:#706860">→</span><span style="color:${b.color}">${lb}</span>`;
+    }else{
+      lbl=`<span style="color:${b.color};font-weight:700">${b.code}</span>`;
+    }
+
+    const item=document.createElement('div');item.className='ai';
     item.innerHTML=`
-      <div style="display:flex;align-items:center;gap:5px">
+      <div style="display:flex;align-items:center;gap:5px;min-width:0;flex:1">
         <div class="adot" style="background:${b.color}"></div>
-        <span style="color:${b.color};font-weight:700">${b.code}</span>
-        <span style="color:#666460;font-size:.67rem">v${fLabel} – v${tLabel}</span>
+        ${lbl}
+        <span style="color:#706860;font-size:.67rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">v${fl}–v${tl}</span>
       </div>
-      <button class="adel" onclick="deleteB(${b.id})">✕</button>`;
+      <div style="display:flex;gap:3px;flex-shrink:0">
+        ${canFlip?`<button class="aflip" onclick="flipB(${b.id})" title="Flip order">⇄</button>`:''}
+        <button class="adel" onclick="deleteB(${b.id})" title="Delete">✕</button>
+      </div>`;
     el.appendChild(item);
   });
 }
 
-// ─── Export ──────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════
 function setBg(mode,val){
   exportBg=mode;exportBgColor=val||null;
   document.querySelectorAll('.bgsw').forEach(s=>s.classList.remove('on'));
@@ -744,7 +893,7 @@ async function exportPNG(){
   const ws=document.getElementById('ws');
   const btn=document.querySelector('[onclick="exportPNG()"]');
   btn.textContent='Exporting…';btn.disabled=true;
-  const bgMap={t:null,p:'#f9f6f0',w:'#ffffff',d:'#1a1810'};
+  const bgMap={t:null,p:'#f8f5ef',w:'#ffffff',d:'#18160f'};
   const bg=exportBg==='c'?exportBgColor:(bgMap[exportBg]??null);
   try{
     const canvas=await html2canvas(ws,{scale:2,useCORS:true,backgroundColor:bg,logging:false});
@@ -755,21 +904,20 @@ async function exportPNG(){
   btn.textContent='Export PNG';btn.disabled=false;
 }
 
-// ─── UI helpers ──────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════════
 function showLoading(){
   document.getElementById('wstop').style.display='none';
-  const area=document.getElementById('pa'),svg=document.getElementById('bsvg'),emsg=document.getElementById('emsg');
-  Array.from(area.children).forEach(c=>{if(c!==svg&&c!==emsg)c.remove()});
+  const area=document.getElementById('pa'),emsg=document.getElementById('emsg');
+  Array.from(area.children).forEach(c=>{if(c!==document.getElementById('bsvg')&&c!==emsg)c.remove()});
   if(emsg){emsg.style.display='block';emsg.innerHTML='<div class="loading"><div class="spin"></div>Loading…</div>'}
 }
 function showEmpty(){
   const e=document.getElementById('emsg');
   if(e){e.style.display='block';e.innerHTML='Enter a reference above to begin.'}
 }
-function showErr(msg){
-  document.getElementById('ebox').innerHTML=`<div class="ebox">${msg}</div>`;
-  setTimeout(()=>document.getElementById('ebox').innerHTML='',6000);
-}
+function showErr(msg){document.getElementById('ebox').innerHTML=`<div class="ebox">${msg}</div>`;setTimeout(()=>document.getElementById('ebox').innerHTML='',6000)}
 function clearErr(){document.getElementById('ebox').innerHTML=''}
 function showTT(e,html){const tt=document.getElementById('tt');tt.innerHTML=html;tt.style.opacity='1';tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY+10)+'px'}
 function hideTT(){document.getElementById('tt').style.opacity='0'}
