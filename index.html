@@ -7,247 +7,139 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-/* ── Reset & Tokens ── */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --paper:#f9f6f0; --rule:#d8d0c0; --ink:#1c1a16; --ink2:#4a4640; --ink3:#8a8680;
-  --gold:#b8963e; --gold2:#c9a848;
-  --c-coord:#3a72a8; --c-restate:#3d8050; --c-distinct:#b86e20; --c-contrary:#a83838;
-  --sidebar-bg:#1e1c18; --chrome:#161410; --border:#2e2c28;
-  --serif:'EB Garamond',Georgia,serif; --ui:'Spectral',Georgia,serif;
-  --sidebar-w:270px; --header-h:50px;
+  --paper:#f9f6f0;--rule:#d8d0c0;--ink:#1c1a16;--ink3:#8a8680;
+  --gold:#b8963e;--gold2:#c9a848;
+  --c-coord:#3a72a8;--c-restate:#3d8050;--c-distinct:#b86e20;--c-contrary:#a83838;
+  --chrome:#161410;--border:#2e2c28;--sbg:#1e1c18;
+  --serif:'EB Garamond',Georgia,serif;--ui:'Spectral',Georgia,serif;
+  --sw:270px;--hh:50px;
 }
-
 html,body{height:100%;overflow:hidden}
 body{font-family:var(--serif);background:var(--chrome);color:var(--ink);display:flex;flex-direction:column}
 
-/* ── Header ── */
-header{
-  height:var(--header-h);flex-shrink:0;
-  background:var(--chrome);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 1rem;gap:0.75rem;
-}
-.logo{font-style:italic;color:var(--gold);font-size:1.05rem;font-weight:500;letter-spacing:.04em;flex-shrink:0}
-.hdr-ref{flex:1;min-width:0;display:flex;gap:6px;align-items:center}
-input.hdr-input{
-  flex:1;min-width:0;background:#28251f;border:1px solid #3e3c38;color:#e0dbd2;
-  font-family:var(--ui);font-size:0.85rem;padding:6px 10px;border-radius:4px;outline:none;
-}
-input.hdr-input:focus{border-color:var(--gold)}
-input.hdr-input::placeholder{color:#5a5650}
-.hdr-btn{
-  font-family:var(--ui);font-size:0.78rem;padding:6px 14px;border-radius:4px;
-  cursor:pointer;border:none;white-space:nowrap;background:var(--gold);color:#1a1810;font-weight:600;
-}
-.hdr-btn:hover{background:var(--gold2)}
-.hdr-btn:disabled{opacity:.5;cursor:default}
-.hdr-btn-ghost{background:transparent;border:1px solid #3e3c38;color:#a09880;font-weight:400}
-.hdr-btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
-.menu-btn{
-  display:none;background:none;border:1px solid #3e3c38;color:#a09880;
-  padding:6px 10px;border-radius:4px;cursor:pointer;font-size:1rem;line-height:1;flex-shrink:0;
-}
+/* Header */
+header{height:var(--hh);flex-shrink:0;background:var(--chrome);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1rem;gap:.6rem}
+.logo{font-style:italic;color:var(--gold);font-size:1rem;font-weight:500;flex-shrink:0}
+.hrow{flex:1;min-width:0;display:flex;gap:5px;align-items:center}
+input.hi{flex:1;min-width:0;background:#28251f;border:1px solid #3e3c38;color:#e0dbd2;font-family:var(--ui);font-size:.83rem;padding:6px 9px;border-radius:4px;outline:none}
+input.hi:focus{border-color:var(--gold)}
+input.hi::placeholder{color:#4a4640}
+.hb{font-family:var(--ui);font-size:.76rem;padding:6px 12px;border-radius:4px;cursor:pointer;border:none;white-space:nowrap;background:var(--gold);color:#1a1810;font-weight:600}
+.hb:hover{background:var(--gold2)}.hb:disabled{opacity:.5;cursor:default}
+.hbg{background:transparent;border:1px solid #3e3c38;color:#9a9880;font-weight:400}
+.hbg:hover{border-color:var(--gold);color:var(--gold)}
+.mbtn{display:none;background:none;border:1px solid #3e3c38;color:#9a9880;padding:5px 9px;border-radius:4px;cursor:pointer;font-size:1rem;flex-shrink:0}
+#mpill{font-family:var(--ui);font-size:.7rem;padding:3px 8px;border-radius:10px;flex-shrink:0;cursor:default;border:1px solid}
 
-/* ── Layout ── */
-.body-wrap{flex:1;display:flex;min-height:0;overflow:hidden}
+/* Body */
+.bwrap{flex:1;display:flex;min-height:0;overflow:hidden}
 
-/* ── Sidebar ── */
-.sidebar{
-  width:var(--sidebar-w);flex-shrink:0;
-  background:var(--sidebar-bg);border-right:1px solid var(--border);
-  overflow-y:auto;padding:.85rem .8rem;display:flex;flex-direction:column;gap:1rem;
-}
-.sb-sec{display:flex;flex-direction:column;gap:.35rem}
-.sb-label{
-  font-family:var(--ui);font-size:.62rem;font-weight:500;letter-spacing:.1em;
-  text-transform:uppercase;color:#5a5650;padding-bottom:3px;
-  border-bottom:1px solid var(--border);margin-bottom:2px;
-}
-.rel-group{margin-bottom:.5rem}
-.rel-gt{font-size:.62rem;font-style:italic;color:#5a5650;margin-bottom:3px}
-.rel-grid{display:flex;flex-wrap:wrap;gap:3px}
-.chip{
-  font-family:var(--ui);font-size:.68rem;padding:3px 7px;border-radius:3px;
-  cursor:pointer;border:1px solid transparent;transition:all .12s;user-select:none;font-weight:600;
-}
+/* Sidebar */
+.sidebar{width:var(--sw);flex-shrink:0;background:var(--sbg);border-right:1px solid var(--border);overflow-y:auto;padding:.8rem .75rem;display:flex;flex-direction:column;gap:.9rem}
+.slbl{font-family:var(--ui);font-size:.61rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#4a4640;padding-bottom:3px;border-bottom:1px solid var(--border);margin-bottom:1px}
+.ssec{display:flex;flex-direction:column;gap:.3rem}
+.rgg{margin-bottom:.45rem}
+.rgt{font-size:.61rem;font-style:italic;color:#4a4640;margin-bottom:3px}
+.rgrid{display:flex;flex-wrap:wrap;gap:3px}
+.chip{font-family:var(--ui);font-size:.67rem;padding:3px 7px;border-radius:3px;cursor:pointer;border:1px solid transparent;transition:all .12s;user-select:none;font-weight:600}
 .chip:hover{transform:translateY(-1px);box-shadow:0 2px 5px rgba(0,0,0,.4)}
 .cc{background:#192538;color:#6aaae0;border-color:#253550}
 .cr{background:#182818;color:#6aaa78;border-color:#254030}
 .cd{background:#2a1e10;color:#d4904a;border-color:#453020}
 .cy{background:#281616;color:#d47070;border-color:#452020}
-.help{font-family:var(--ui);font-size:.72rem;color:#5a5650;line-height:1.55;font-style:italic}
-
-/* Arc list */
-.arc-item{
-  background:#252320;border:1px solid #3a3830;border-radius:3px;
-  padding:5px 7px;display:flex;align-items:center;justify-content:space-between;
-  gap:5px;font-size:.7rem;color:#a09880;font-family:var(--ui);
-}
-.arc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.arc-del{background:none;border:none;color:#504e48;cursor:pointer;padding:1px 4px;font-size:.85rem;transition:color .12s}
-.arc-del:hover{color:#d47070}
-
-/* Export bg swatches */
-.bg-row{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.help{font-family:var(--ui);font-size:.71rem;color:#4a4640;line-height:1.55;font-style:italic}
+.arc-item{background:#252320;border:1px solid #3a3830;border-radius:3px;padding:5px 7px;display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:.7rem;color:#9a9880;font-family:var(--ui)}
+.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.adel{background:none;border:none;color:#4a4640;cursor:pointer;padding:1px 4px;font-size:.85rem;transition:color .12s}
+.adel:hover{color:#d47070}
+.bgrow{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
 .bgsw{width:20px;height:20px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all .12s}
-.bgsw.on{border-color:var(--gold)}
-.bgsw:hover{transform:scale(1.1)}
+.bgsw.on{border-color:var(--gold)}.bgsw:hover{transform:scale(1.1)}
 input[type=color].bgsw{padding:0}
-.btn-full{width:100%;font-family:var(--ui);font-size:.75rem;padding:7px;border-radius:3px;cursor:pointer;border:none}
-.btn-g{background:var(--gold);color:#1a1810;font-weight:600}
-.btn-g:hover{background:var(--gold2)}
-.btn-g:disabled{opacity:.5}
-.btn-gh{background:transparent;border:1px solid #3e3c38;color:#a09880;margin-top:3px}
-.btn-gh:hover{border-color:var(--gold);color:var(--gold)}
+.bfull{width:100%;font-family:var(--ui);font-size:.73rem;padding:6px;border-radius:3px;cursor:pointer;border:none;margin-top:3px}
+.bpri{background:var(--gold);color:#1a1810;font-weight:600}.bpri:hover{background:var(--gold2)}.bpri:disabled{opacity:.5}
+.bgho{background:transparent;border:1px solid #3e3c38;color:#9a9880}
+.bgho:hover{border-color:var(--gold);color:var(--gold)}
 
-/* ── Canvas ── */
-.canvas-wrap{flex:1;overflow:auto;background:#28251f;padding:1.25rem;display:flex;align-items:flex-start}
+/* Canvas */
+.cwrap{flex:1;overflow:auto;background:#28251f;padding:1.25rem;display:flex;align-items:flex-start}
 
-/* Workspace (paper) */
-#workspace{
-  background:var(--paper);border-radius:2px;
-  box-shadow:0 4px 32px rgba(0,0,0,.55);
-  position:relative;min-width:300px;width:100%;max-width:900px;
-}
-.ws-top{
-  padding:.85rem 1.25rem .7rem;border-bottom:1px solid var(--rule);
-  display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;
-}
-.ws-ref{font-family:var(--serif);font-size:.9rem;font-weight:600;color:#5c4a2a}
-.ws-trans{font-family:var(--ui);font-size:.65rem;color:var(--ink3);font-style:italic;margin-top:1px}
-.ws-acts{display:flex;gap:4px;flex-shrink:0}
-.ws-btn{
-  font-family:var(--ui);font-size:.68rem;padding:4px 9px;border-radius:3px;
-  cursor:pointer;background:transparent;border:1px solid var(--rule);color:var(--ink3);
-}
-.ws-btn:hover{border-color:var(--gold);color:var(--gold)}
+/* Workspace */
+#ws{background:var(--paper);border-radius:2px;box-shadow:0 4px 32px rgba(0,0,0,.55);position:relative;min-width:280px;width:100%;max-width:860px}
+.wstop{padding:.8rem 1.25rem .65rem;border-bottom:1px solid var(--rule);display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem}
+.wsref{font-family:var(--serif);font-size:.9rem;font-weight:600;color:#5c4a2a}
+.wstr{font-family:var(--ui);font-size:.64rem;color:var(--ink3);font-style:italic;margin-top:1px}
+.wsacts{display:flex;gap:3px;flex-shrink:0}
+.wsb{font-family:var(--ui);font-size:.67rem;padding:3px 8px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--rule);color:var(--ink3)}
+.wsb:hover{border-color:var(--gold);color:var(--gold)}
 
-/* Prop area — left padding grows with bracket columns */
-#prop-area{position:relative;padding:1rem 1.25rem 1.75rem 0}
+/* Prop area */
+#pa{position:relative;padding:0;/* left-padding set dynamically */}
 
-/* Each row */
-.prop-row{display:flex;align-items:flex-start;min-height:26px;position:relative}
-.prop-row.sel .prop-ti{background:rgba(184,150,62,.1);border-radius:2px}
+/* Each row — flex, align STARTS at top */
+.pr{display:flex;align-items:flex-start;position:relative;min-height:24px}
+.pr.sel .pti{background:rgba(184,150,62,.1);border-radius:2px}
 
-/* Verse number */
-.vnum{
-  font-family:var(--ui);font-size:.65rem;color:var(--ink3);
-  width:26px;flex-shrink:0;text-align:right;padding-right:6px;padding-top:4px;
-  user-select:none;font-style:italic;
-}
+/* Verse number: tight, top-aligned */
+.vn{font-family:var(--ui);font-size:.63rem;color:var(--ink3);width:22px;flex-shrink:0;text-align:right;padding-right:5px;padding-top:3px;user-select:none;font-style:italic;line-height:1.75}
 
-/* Checkbox */
-.cbw{width:18px;flex-shrink:0;padding-top:4px;display:flex;justify-content:center}
-.pcb{width:13px;height:13px;cursor:pointer;accent-color:var(--gold)}
+/* Verse sub-label (5a, 5b…) */
+.vsub{font-family:var(--ui);font-size:.6rem;color:#aaa;width:20px;flex-shrink:0;padding-right:3px;padding-top:3px;user-select:none;font-style:italic;text-align:left;line-height:1.75}
+
+/* Checkbox — top aligned */
+.cbw{width:17px;flex-shrink:0;padding-top:3px;display:flex;justify-content:center}
+.pcb{width:12px;height:12px;cursor:pointer;accent-color:var(--gold)}
 
 /* Text */
-.ptc{flex:1;min-width:0}
-.prop-ti{
-  font-family:var(--serif);font-size:1rem;line-height:1.75;color:var(--ink);
-  padding:1px 2px;cursor:default;word-break:break-word;
-}
+.ptc{flex:1;min-width:0;padding:0 1.25rem .1rem 0}
+.pti{font-family:var(--serif);font-size:1rem;line-height:1.75;color:var(--ink);padding:1px 2px;word-break:break-word}
 
 /* Split zones */
-.sz{display:inline;cursor:pointer;position:relative}
-.sz:hover{color:#c03030}
-.sz:hover .sl{opacity:1}
-.sl{
-  display:inline-block;color:#c83030;font-weight:700;opacity:0;
-  transition:opacity .1s;user-select:none;pointer-events:none;
-  font-size:.9em;line-height:1;vertical-align:baseline;margin:0 1px;
-}
+.sz{display:inline;cursor:pointer}.sz:hover{color:#c03030}.sz:hover .sl{opacity:1}
+.sl{display:inline-block;color:#c83030;font-weight:700;opacity:0;transition:opacity .1s;user-select:none;pointer-events:none;font-size:.85em;line-height:1;margin:0 1px}
 
-/* SVG bracket layer */
-#bsvg{position:absolute;top:0;left:0;pointer-events:none;z-index:5}
+/* Bracket SVG */
+#bsvg{position:absolute;top:0;left:0;pointer-events:none;z-index:5;overflow:visible}
 
 /* States */
-.empty{
-  padding:2.5rem 1.5rem;text-align:center;color:var(--ink3);
-  font-family:var(--ui);font-size:.82rem;font-style:italic;line-height:1.8;
-}
-.loading{
-  padding:1.5rem;display:flex;align-items:center;gap:8px;
-  color:var(--ink3);font-family:var(--ui);font-size:.82rem;
-}
-.spin{
-  width:14px;height:14px;border:2px solid var(--rule);
-  border-top-color:var(--gold);border-radius:50%;animation:spin .5s linear infinite;flex-shrink:0;
-}
+.empty{padding:2.5rem 1.5rem;text-align:center;color:var(--ink3);font-family:var(--ui);font-size:.82rem;font-style:italic;line-height:1.8}
+.loading{padding:1.5rem;display:flex;align-items:center;gap:8px;color:var(--ink3);font-family:var(--ui);font-size:.82rem}
+.spin{width:14px;height:14px;border:2px solid var(--rule);border-top-color:var(--gold);border-radius:50%;animation:spin .5s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-.err-box{
-  margin:.5rem 1.25rem;background:#2a1616;border:1px solid #4a2222;
-  color:#d47070;padding:6px 10px;border-radius:3px;font-size:.75rem;font-family:var(--ui);
-}
+.ebox{margin:.5rem 1.25rem;background:#2a1616;border:1px solid #4a2222;color:#d47070;padding:6px 10px;border-radius:3px;font-size:.75rem;font-family:var(--ui)}
 
-/* Key modal overlay */
-.key-modal{
-  position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);
-  display:flex;align-items:center;justify-content:center;padding:1rem;
-}
-.key-card{
-  background:#1e1c18;border:1px solid var(--border);border-radius:6px;
-  padding:1.5rem;max-width:400px;width:100%;
-  display:flex;flex-direction:column;gap:.85rem;
-}
-.key-title{font-family:var(--serif);font-size:1.1rem;color:var(--gold);font-style:italic}
-.key-desc{font-family:var(--ui);font-size:.78rem;color:#9a9688;line-height:1.6}
-.key-desc a{color:var(--gold)}
-.key-input{
-  background:#28251f;border:1px solid #4a4640;color:#e0dbd2;
-  font-family:var(--ui);font-size:.85rem;padding:8px 12px;border-radius:4px;outline:none;width:100%;
-}
-.key-input:focus{border-color:var(--gold)}
-.key-row{display:flex;gap:8px}
-.key-btn{
-  flex:1;font-family:var(--ui);font-size:.8rem;padding:8px;border-radius:4px;
-  cursor:pointer;border:none;font-weight:600;
-}
-.key-btn-p{background:var(--gold);color:#1a1810}
-.key-btn-p:hover{background:var(--gold2)}
-.key-btn-s{background:transparent;border:1px solid #4a4640;color:#9a9688}
-.key-btn-s:hover{color:var(--gold);border-color:var(--gold)}
+/* Key modal */
+.kmodal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:1rem}
+.kcard{background:#1e1c18;border:1px solid var(--border);border-radius:6px;padding:1.5rem;max-width:400px;width:100%;display:flex;flex-direction:column;gap:.85rem}
+.ktitle{font-family:var(--serif);font-size:1.1rem;color:var(--gold);font-style:italic}
+.kdesc{font-family:var(--ui);font-size:.78rem;color:#9a9688;line-height:1.6}
+.kdesc a{color:var(--gold)}
+.kinp{background:#28251f;border:1px solid #4a4640;color:#e0dbd2;font-family:var(--ui);font-size:.85rem;padding:8px 12px;border-radius:4px;outline:none;width:100%}
+.kinp:focus{border-color:var(--gold)}
+.krow{display:flex;gap:8px}
+.kb{flex:1;font-family:var(--ui);font-size:.8rem;padding:8px;border-radius:4px;cursor:pointer;border:none;font-weight:600}
+.kbp{background:var(--gold);color:#1a1810}.kbp:hover{background:var(--gold2)}
+.kbs{background:transparent;border:1px solid #4a4640;color:#9a9688}.kbs:hover{color:var(--gold);border-color:var(--gold)}
 
 /* Tooltip */
-.tt{
-  position:fixed;background:#111;color:#e8e2d8;font-family:var(--ui);
-  font-size:.7rem;padding:5px 9px;border-radius:3px;border:1px solid #3a3830;
-  max-width:200px;line-height:1.5;pointer-events:none;z-index:9999;opacity:0;transition:opacity .08s;
-}
+.tt{position:fixed;background:#111;color:#e8e2d8;font-family:var(--ui);font-size:.7rem;padding:5px 9px;border-radius:3px;border:1px solid #3a3830;max-width:210px;line-height:1.5;pointer-events:none;z-index:9999;opacity:0;transition:opacity .08s}
 
-/* ── Mobile ── */
+/* Mobile */
 @media(max-width:680px){
-  :root{--header-h:54px}
-  .menu-btn{display:block}
-  .sidebar{
-    position:fixed;bottom:0;left:0;right:0;top:auto;
-    width:100%;max-height:65vh;border-right:none;border-top:1px solid var(--border);
-    transform:translateY(100%);transition:transform .25s ease;z-index:100;
-    border-radius:12px 12px 0 0;
-  }
+  .mbtn{display:block}
+  .sidebar{position:fixed;bottom:0;left:0;right:0;top:auto;width:100%;max-height:65vh;border-right:none;border-top:1px solid var(--border);transform:translateY(100%);transition:transform .25s ease;z-index:100;border-radius:12px 12px 0 0}
   .sidebar.open{transform:translateY(0)}
-  .sidebar-drag{
-    width:36px;height:4px;background:#4a4640;border-radius:2px;
-    margin:0 auto 10px;cursor:pointer;
-  }
-  .body-wrap{flex-direction:column}
-  .canvas-wrap{padding:.75rem}
-  #workspace{min-width:0}
-  .prop-ti{font-size:.95rem;line-height:1.7}
-  .ws-top{padding:.7rem 1rem .6rem}
-  .hdr-btn-ghost{display:none}
-  /* Bigger tap targets for checkboxes */
-  .cbw{width:28px}
-  .pcb{width:16px;height:16px}
-  /* Taller split zones for easier touch */
-  .sz{padding:2px 0}
+  .drag{width:36px;height:4px;background:#3e3c38;border-radius:2px;margin:0 auto 10px;cursor:pointer}
+  .cwrap{padding:.75rem}
+  .hbg{display:none}
+  .cbw{width:24px}.pcb{width:15px;height:15px}
 }
-@media(max-width:420px){
-  header{padding:0 .75rem;gap:.5rem}
-  .logo{font-size:.95rem}
-  .canvas-wrap{padding:.5rem}
+@media(max-width:400px){
+  header{padding:0 .6rem;gap:.4rem}
+  .logo{font-size:.9rem}
 }
-
-/* scrollbars */
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#3e3c38;border-radius:3px}
@@ -256,115 +148,84 @@ input[type=color].bgsw{padding:0}
 </head>
 <body>
 
-<!-- Key setup modal -->
-<div class="key-modal" id="key-modal">
-  <div class="key-card">
-    <div class="key-title">ESV API Key</div>
-    <div class="key-desc">
-      Enter your ESV API key to load passages. Get a free key at
-      <a href="https://api.esv.org" target="_blank">api.esv.org</a> if you don't have one.
-      Your key is saved in your browser's local storage.
-    </div>
-    <input class="key-input" id="key-input" type="text" placeholder="Paste your API key here…" />
-    <div class="key-row">
-      <button class="key-btn key-btn-p" onclick="saveKey()">Save &amp; Continue</button>
-      <button class="key-btn key-btn-s" onclick="skipKey()">Use Demo Key</button>
+<!-- API Key Modal -->
+<div class="kmodal" id="kmodal">
+  <div class="kcard">
+    <div class="ktitle">ESV API Key</div>
+    <div class="kdesc">Enter your ESV API key to load passages. Get a free key at <a href="https://api.esv.org" target="_blank">api.esv.org</a>. Saved to your browser.</div>
+    <input class="kinp" id="kinp" type="text" placeholder="Paste your ESV API key…"/>
+    <div class="krow">
+      <button class="kb kbp" onclick="saveKey()">Save &amp; Continue</button>
+      <button class="kb kbs" onclick="skipKey()">Use Demo Mode</button>
     </div>
   </div>
 </div>
 
-<!-- Header -->
 <header>
   <div class="logo">𝒜rc</div>
-  <div class="hdr-ref">
-    <input class="hdr-input" id="vi" type="text" placeholder="e.g. Romans 8:1-4" autocomplete="off" autocorrect="off" spellcheck="false"/>
-    <button class="hdr-btn" id="load-btn" onclick="fetchVerse()">Load</button>
-    <button class="hdr-btn hdr-btn-ghost" onclick="showKeyModal()" title="Change API key">Key</button>
+  <div class="hrow">
+    <input class="hi" id="vi" type="text" placeholder="e.g. Philippians 1:1-11" autocomplete="off" spellcheck="false"/>
+    <button class="hb" id="lbtn" onclick="fetchVerse()">Load</button>
+    <button class="hb hbg" onclick="showKeyModal()" title="Change API key">Key</button>
   </div>
-  <button class="menu-btn" id="menu-btn" onclick="toggleSidebar()">☰</button>
-  <span id="mode-pill" class="chip cc" style="flex-shrink:0;cursor:default">Browse</span>
+  <button class="mbtn" id="mbtn" onclick="toggleSB()">☰</button>
+  <span id="mpill" style="background:#192538;color:#6aaae0;border-color:#253550">Browse</span>
 </header>
 
-<!-- Body -->
-<div class="body-wrap">
+<div class="bwrap">
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-drag" onclick="toggleSidebar()"></div>
+    <div class="drag" onclick="toggleSB()"></div>
 
-    <div class="sb-sec">
-      <div class="sb-label">Instructions</div>
-      <div class="help" id="instr">
-        1. Load a passage<br>
-        2. Tap between words to split<br>
-        3. Check 2 propositions<br>
-        4. Tap a relationship
-      </div>
+    <div class="ssec">
+      <div class="slbl">Instructions</div>
+      <div class="help" id="instr">1. Load a passage<br>2. Hover/tap between words to split<br>3. Check 2 propositions<br>4. Tap a relationship</div>
     </div>
 
-    <div class="sb-sec">
-      <div class="sb-label">Relationships</div>
-      <div class="rel-group">
-        <div class="rel-gt">Coordinate</div>
-        <div class="rel-grid" id="rg-coord"></div>
-      </div>
-      <div class="rel-group">
-        <div class="rel-gt">Restatement</div>
-        <div class="rel-grid" id="rg-restate"></div>
-      </div>
-      <div class="rel-group">
-        <div class="rel-gt">Distinct Statement</div>
-        <div class="rel-grid" id="rg-distinct"></div>
-      </div>
-      <div class="rel-group">
-        <div class="rel-gt">Contrary Statement</div>
-        <div class="rel-grid" id="rg-contrary"></div>
-      </div>
+    <div class="ssec">
+      <div class="slbl">Relationships</div>
+      <div class="rgg"><div class="rgt">Coordinate</div><div class="rgrid" id="rg-coord"></div></div>
+      <div class="rgg"><div class="rgt">Restatement</div><div class="rgrid" id="rg-restate"></div></div>
+      <div class="rgg"><div class="rgt">Distinct Statement</div><div class="rgrid" id="rg-distinct"></div></div>
+      <div class="rgg"><div class="rgt">Contrary Statement</div><div class="rgrid" id="rg-contrary"></div></div>
     </div>
 
-    <div class="sb-sec">
-      <div class="sb-label">Brackets</div>
-      <div id="arc-list"><div class="help">None yet.</div></div>
+    <div class="ssec">
+      <div class="slbl">Brackets</div>
+      <div id="alist"><div class="help">None yet.</div></div>
     </div>
 
-    <div class="sb-sec">
-      <div class="sb-label">Export</div>
+    <div class="ssec">
+      <div class="slbl">Export</div>
       <div class="help" style="margin-bottom:4px">Background</div>
-      <div class="bg-row" style="margin-bottom:8px">
-        <div class="bgsw on" id="bgsw-t" title="Transparent"
-          style="background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px"
-          onclick="setBg('t')"></div>
+      <div class="bgrow">
+        <div class="bgsw on" id="bgsw-t" title="Transparent" style="background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px" onclick="setBg('t')"></div>
         <div class="bgsw" id="bgsw-p" title="Paper" style="background:#f9f6f0" onclick="setBg('p')"></div>
         <div class="bgsw" id="bgsw-w" title="White" style="background:#fff" onclick="setBg('w')"></div>
         <div class="bgsw" id="bgsw-d" title="Dark" style="background:#1a1810" onclick="setBg('d')"></div>
-        <input type="color" class="bgsw" id="bgsw-c" value="#f9f6f0" title="Custom" onchange="setBg('c',this.value)" style="cursor:pointer">
+        <input type="color" class="bgsw" id="bgsw-c" value="#f9f6f0" title="Custom" onchange="setBg('c',this.value)">
       </div>
-      <button class="btn-full btn-g" onclick="exportPNG()">Export PNG</button>
-      <button class="btn-full btn-gh" onclick="clearArcs()" style="margin-top:4px">Clear brackets</button>
-      <button class="btn-full btn-gh" onclick="resetSplits()">Reset splits</button>
-      <button class="btn-full btn-gh" onclick="autoSplit()">Auto-split</button>
+      <button class="bfull bpri" onclick="exportPNG()">Export PNG</button>
+      <button class="bfull bgho" onclick="undoSplit()">Undo last split</button>
+      <button class="bfull bgho" onclick="clearArcs()">Clear brackets</button>
+      <button class="bfull bgho" onclick="resetSplits()">Reset all splits</button>
+      <button class="bfull bgho" onclick="autoSplit()">Auto-split</button>
     </div>
   </aside>
 
-  <!-- Canvas -->
-  <div class="canvas-wrap" id="canvas-wrap" onclick="handleCanvasClick(event)">
-    <div id="workspace">
-      <div class="ws-top" id="ws-top" style="display:none">
-        <div>
-          <div class="ws-ref" id="ws-ref"></div>
-          <div class="ws-trans">English Standard Version</div>
-        </div>
-        <div class="ws-acts">
-          <button class="ws-btn" onclick="autoSplit()">Auto-split</button>
+  <div class="cwrap" id="cwrap">
+    <div id="ws">
+      <div class="wstop" id="wstop" style="display:none">
+        <div><div class="wsref" id="wsref"></div><div class="wstr">English Standard Version</div></div>
+        <div class="wsacts">
+          <button class="wsb" onclick="undoSplit()" title="Undo last split">↩ Undo</button>
+          <button class="wsb" onclick="autoSplit()">Auto-split</button>
         </div>
       </div>
-      <div id="err-box"></div>
-      <div id="prop-area" style="position:relative">
+      <div id="ebox"></div>
+      <div id="pa" style="position:relative">
         <svg id="bsvg" xmlns="http://www.w3.org/2000/svg"></svg>
-        <div class="empty" id="empty-msg">
-          Enter a reference above to begin.<br>
-          <span style="font-size:.75rem;opacity:.6">Romans 8:1-4 · Jude 20-21 · Philippians 2:5-11</span>
-        </div>
+        <div class="empty" id="emsg">Enter a reference above to begin.<br><span style="font-size:.75rem;opacity:.55">Romans 8:1-4 · Jude 20-21 · Philippians 1:3-11</span></div>
       </div>
     </div>
   </div>
@@ -373,13 +234,13 @@ input[type=color].bgsw{padding:0}
 <div class="tt" id="tt"></div>
 
 <script>
-// ── Relationships ──────────────────────────────
+// ─── Relationship data ───────────────────────────────────────────────────────
 const CAT_COLOR={coord:'#3a72a8',restate:'#3d8050',distinct:'#b86e20',contrary:'#a83838'};
 const RELS={
   coord:[
-    {code:'S',  name:'Series',          cat:'coord',   desc:'Each proposition makes its own independent contribution to a whole.'},
-    {code:'P',  name:'Progression',     cat:'coord',   desc:'Like Series, but each proposition is a further step toward a climax.'},
-    {code:'A',  name:'Alternative',     cat:'coord',   desc:'Each proposition expresses a different possibility arising from a situation.'},
+    {code:'S',  name:'Series',           cat:'coord',   desc:'Each proposition makes its own independent contribution to a whole.'},
+    {code:'P',  name:'Progression',      cat:'coord',   desc:'Like Series, but each proposition is a further step toward a climax.'},
+    {code:'A',  name:'Alternative',      cat:'coord',   desc:'Each proposition expresses a different possibility arising from a situation.'},
   ],
   restate:[
     {code:'Ac/Mn', name:'Action-Manner',    cat:'restate', desc:'An action and the way or manner that action is carried out. Can also indicate means.'},
@@ -389,215 +250,206 @@ const RELS={
     {code:'Q/A',   name:'Question-Answer',  cat:'restate', desc:'The statement of a question and its answer.'},
   ],
   distinct:[
-    {code:'G',     name:'Ground',          cat:'distinct',desc:'A statement and the argument/reason for it (reason follows).'},
-    {code:'∴',     name:'Inference',       cat:'distinct',desc:'A statement and the reason for it (reason precedes). Conjunctions: therefore, accordingly.'},
-    {code:'BL',    name:'Bilateral',       cat:'distinct',desc:'A proposition that supports one preceding and one following proposition.'},
-    {code:'Ac/Res',name:'Action-Result',   cat:'distinct',desc:'An action and a consequence or result which accompanies it.'},
-    {code:'Ac/Pur',name:'Action-Purpose',  cat:'distinct',desc:'An action and its intended result. Conjunctions: in order that, so that, lest.'},
-    {code:'If/Th', name:'Conditional',     cat:'distinct',desc:'Like Action-Result but the action is only potential; result is contingent on it.'},
-    {code:'T',     name:'Temporal',        cat:'distinct',desc:'A statement and the occasion when it is true or can occur.'},
-    {code:'L',     name:'Locative',        cat:'distinct',desc:'A statement and the place where it is true or can occur.'},
+    {code:'G',     name:'Ground',           cat:'distinct',desc:'A statement and the argument/reason for it (reason follows).'},
+    {code:'∴',     name:'Inference',        cat:'distinct',desc:'A statement and the reason for it (reason precedes). Conjunctions: therefore, accordingly.'},
+    {code:'BL',    name:'Bilateral',        cat:'distinct',desc:'A proposition supporting one preceding and one following proposition.'},
+    {code:'Ac/Res',name:'Action-Result',    cat:'distinct',desc:'An action and a consequence or result which accompanies it.'},
+    {code:'Ac/Pur',name:'Action-Purpose',   cat:'distinct',desc:'An action and its intended result. Conjunctions: in order that, so that, lest.'},
+    {code:'If/Th', name:'Conditional',      cat:'distinct',desc:'Like Action-Result but the action is only potential; result is contingent on it.'},
+    {code:'T',     name:'Temporal',         cat:'distinct',desc:'A statement and the occasion when it is true or can occur.'},
+    {code:'L',     name:'Locative',         cat:'distinct',desc:'A statement and the place where it is true or can occur.'},
   ],
   contrary:[
-    {code:'Csv',   name:'Concessive',         cat:'contrary',desc:'A main clause that stands despite a contrary statement.'},
-    {code:'Sit/R', name:'Situation-Response', cat:'contrary',desc:'A situation and its surprising or counter-intuitive response.'},
+    {code:'Csv',   name:'Concessive',          cat:'contrary',desc:'A main clause that stands despite a contrary statement.'},
+    {code:'Sit/R', name:'Situation-Response',  cat:'contrary',desc:'A situation and its surprising or counter-intuitive response.'},
   ]
 };
 const RBC={};Object.values(RELS).flat().forEach(r=>RBC[r.code]=r);
 
-// ── State ─────────────────────────────────────
-let props=[],brackets=[],selected=[];
-let nextBId=1,nextPId=0,rawVerses=null,currentRef='',esvKey='';
-let exportBg='t',exportBgColor=null;
+// ─── State ───────────────────────────────────────────────────────────────────
+// Each prop: { id, text, verseNum, subLabel }
+// subLabel: '' for unsplit verses, 'a','b',... for splits
+// splitHistory: stack of snapshots for undo
+let props=[], brackets=[], selected=[];
+let nextBId=1, nextPId=0;
+let rawVerses=null, currentRef='';
+let splitHistory=[];   // array of props snapshots
+let exportBg='t', exportBgColor=null;
+let esvKey='';
 
-// ── Init ──────────────────────────────────────
+// ─── Init ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
-  // Load saved key
   esvKey=localStorage.getItem('esv_key')||'';
-  if(esvKey) document.getElementById('key-modal').style.display='none';
-
+  if(esvKey) document.getElementById('kmodal').style.display='none';
   buildPalette();
-  const vi=document.getElementById('vi');
-  vi.addEventListener('keydown',e=>{if(e.key==='Enter')fetchVerse()});
-
-  // Close sidebar when tapping canvas on mobile
-  document.getElementById('canvas-wrap').addEventListener('click',()=>{
-    if(window.innerWidth<=680) closeSidebar();
-  });
-
-  new ResizeObserver(()=>renderBrackets()).observe(document.getElementById('workspace'));
+  document.getElementById('vi').addEventListener('keydown',e=>{if(e.key==='Enter')fetchVerse()});
+  new ResizeObserver(()=>renderBrackets()).observe(document.getElementById('ws'));
 });
 
+// ─── Key modal ───────────────────────────────────────────────────────────────
 function saveKey(){
-  const v=document.getElementById('key-input').value.trim();
+  const v=document.getElementById('kinp').value.trim();
   if(!v){alert('Please enter an API key');return}
-  esvKey=v;
-  localStorage.setItem('esv_key',v);
-  document.getElementById('key-modal').style.display='none';
+  esvKey=v; localStorage.setItem('esv_key',v);
+  document.getElementById('kmodal').style.display='none';
 }
-function skipKey(){
-  esvKey='TEST';
-  document.getElementById('key-modal').style.display='none';
-}
-function showKeyModal(){
-  document.getElementById('key-input').value=esvKey;
-  document.getElementById('key-modal').style.display='flex';
-}
+function skipKey(){esvKey='TEST';document.getElementById('kmodal').style.display='none'}
+function showKeyModal(){document.getElementById('kinp').value=esvKey;document.getElementById('kmodal').style.display='flex'}
 
+// ─── Palette ─────────────────────────────────────────────────────────────────
 function buildPalette(){
-  const map=[
-    {key:'coord',  el:'rg-coord',   cls:'cc'},
-    {key:'restate',el:'rg-restate', cls:'cr'},
-    {key:'distinct',el:'rg-distinct',cls:'cd'},
-    {key:'contrary',el:'rg-contrary',cls:'cy'},
-  ];
-  map.forEach(({key,el,cls})=>{
-    const wrap=document.getElementById(el);
+  [{key:'coord',el:'rg-coord',cls:'cc'},{key:'restate',el:'rg-restate',cls:'cr'},
+   {key:'distinct',el:'rg-distinct',cls:'cd'},{key:'contrary',el:'rg-contrary',cls:'cy'}
+  ].forEach(({key,el,cls})=>{
+    const w=document.getElementById(el);
     RELS[key].forEach(rel=>{
       const ch=document.createElement('div');
-      ch.className=`chip ${cls}`;
-      ch.textContent=rel.code;
-      ch.title=rel.name;
+      ch.className=`chip ${cls}`;ch.textContent=rel.code;ch.title=rel.name;
       ch.addEventListener('click',()=>applyBracket(rel.code));
       ch.addEventListener('mouseenter',e=>showTT(e,`<b>${rel.name}</b><br>${rel.desc}`));
       ch.addEventListener('mouseleave',hideTT);
-      wrap.appendChild(ch);
+      w.appendChild(ch);
     });
   });
 }
 
-// ── Sidebar (mobile) ──────────────────────────
-function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('open');
-}
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-}
-function handleCanvasClick(e){
-  if(window.innerWidth<=680&&!e.target.closest('.prop-row')) closeSidebar();
-}
+// ─── Sidebar (mobile) ────────────────────────────────────────────────────────
+function toggleSB(){document.getElementById('sidebar').classList.toggle('open')}
+function closeSB(){document.getElementById('sidebar').classList.remove('open')}
 
-// ── ESV API ───────────────────────────────────
+// ─── ESV API ─────────────────────────────────────────────────────────────────
 async function fetchVerse(){
   const ref=document.getElementById('vi').value.trim();
   if(!ref)return;
   if(!esvKey){showKeyModal();return}
-  currentRef=ref;
-  showLoading();
-
+  currentRef=ref; showLoading();
   try{
-    // ESV API — note: requires CORS. Works from localhost and GitHub Pages.
-    // If blocked by browser CORS, falls back to a CORS proxy.
     const params=new URLSearchParams({
       q:ref,
-      'include-headings':'false',
-      'include-footnotes':'false',
-      'include-verse-numbers':'true',
-      'include-short-copyright':'false',
-      'include-passage-references':'false',
-      'indent-paragraphs':'0',
-      'indent-poetry':'false',
-      'indent-using':'spaces',
+      'include-headings':'false','include-footnotes':'false',
+      'include-verse-numbers':'true','include-short-copyright':'false',
+      'include-passage-references':'false','indent-paragraphs':'0',
+      'indent-poetry':'false','indent-using':'spaces',
+      'line-length':'0',
     });
     const url=`https://api.esv.org/v3/passage/text/?${params}`;
     let data;
     try{
       const r=await fetch(url,{headers:{Authorization:`Token ${esvKey}`}});
-      if(!r.ok) throw new Error(`ESV API error ${r.status}`);
+      if(!r.ok) throw new Error(`ESV API responded with status ${r.status}`);
       data=await r.json();
-    }catch(corsErr){
-      // CORS proxy fallback (for local file:// usage)
-      const proxyUrl=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-      const r2=await fetch(proxyUrl);
-      if(!r2.ok) throw new Error('Could not reach ESV API. Check your key and connection.');
+    }catch(e){
+      // CORS proxy fallback (local file:// usage)
+      const r2=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+      if(!r2.ok) throw new Error('Could not reach ESV API. Check your key and network.');
       data=await r2.json();
     }
-
     if(!data.passages||!data.passages[0]) throw new Error('No passage found for: '+ref);
-
-    const passage=data.passages[0];
-    const verses=parseESVPassage(passage);
+    const verses=parseESV(data.passages[0]);
     if(!verses.length) throw new Error('Could not parse passage text.');
-
     rawVerses=verses;
     setupProps(ref,verses);
     clearErr();
-  }catch(e){
-    showErr(e.message);
-    showEmpty();
-  }
+  }catch(e){showErr(e.message);showEmpty()}
 }
 
-function parseESVPassage(text){
-  // ESV text comes back with [verse_num] markers inline
-  // e.g. "  [1] In the beginning... [2] The earth was..."
+function parseESV(text){
+  // ESV returns text with inline [N] verse markers
   const cleaned=text.replace(/\s+/g,' ').trim();
   const parts=cleaned.split(/\[(\d+)\]/);
-  // parts: ['preamble', '1', 'verse text', '2', 'verse text', ...]
-  const verses=[];
+  const out=[];
   for(let i=1;i<parts.length;i+=2){
     const num=parseInt(parts[i]);
     const txt=(parts[i+1]||'').replace(/\s+/g,' ').trim();
-    if(txt) verses.push({verse:num,text:txt});
+    if(txt) out.push({verse:num,text:txt});
   }
-  return verses;
+  return out;
 }
 
-// ── Setup ─────────────────────────────────────
+// ─── Setup propositions ──────────────────────────────────────────────────────
 function setupProps(ref,verses){
-  nextPId=0; selected=[]; brackets=[];
-  props=verses.map(v=>({
-    id:++nextPId,
-    text:v.text,
-    verseNum:v.verse,
-  }));
-  document.getElementById('ws-top').style.display='flex';
-  document.getElementById('ws-ref').textContent=ref;
-  document.getElementById('empty-msg').style.display='none';
-  renderAll();
-  updateBracketList();
-  setMode('browse');
+  nextPId=0; selected=[]; brackets=[]; splitHistory=[];
+  props=verses.map(v=>({id:++nextPId,text:v.text,verseNum:v.verse,subLabel:''}));
+  document.getElementById('wstop').style.display='flex';
+  document.getElementById('wsref').textContent=ref;
+  document.getElementById('emsg').style.display='none';
+  renderAll(); updateAList(); setMode('browse');
 }
 
-// ── Split ──────────────────────────────────────
-function autoSplit(){
-  if(!props.length)return;
-  const next=[];
+// ─── Sub-label system: a,b,c...z ─────────────────────────────────────────────
+// Given a verseNum, find all props with that verseNum and assign a,b,c...
+// A verse with no splits has subLabel=''. After first split: 'a','b'.
+// Further splits produce 'a','b','c' etc. on that verse.
+function recomputeSubLabels(){
+  const byVerse={};
   props.forEach(p=>{
-    const parts=smartSplit(p.text);
-    if(parts.length<=1){next.push(p);return}
-    parts.forEach(t=>next.push({id:++nextPId,text:t,verseNum:p.verseNum}));
+    if(!byVerse[p.verseNum]) byVerse[p.verseNum]=[];
+    byVerse[p.verseNum].push(p);
   });
-  props=next; brackets=[];
-  renderAll(); updateBracketList();
+  Object.values(byVerse).forEach(group=>{
+    if(group.length===1){
+      group[0].subLabel='';
+    }else{
+      group.forEach((p,i)=>{
+        // a=0, b=1, ... z=25
+        p.subLabel=String.fromCharCode(97+i);
+      });
+    }
+  });
 }
 
-function smartSplit(text){
-  // Semicolons first
-  let parts=text.split(/;\s*/);
-  // Then clause conjunctions
-  parts=parts.flatMap(p=>{
-    const m=p.match(/^(.{10,}?),?\s+\b(for|because|so that|in order|when|if|although|therefore|but|and|that|who|which)\b\s+(.{5,})$/i);
-    if(m) return [m[1].trim(),(m[2]+' '+m[3]).trim()];
-    return [p];
-  });
-  return parts.map(s=>s.trim()).filter(Boolean);
-}
-
+// ─── Split ───────────────────────────────────────────────────────────────────
 function splitAt(propId,wordIdx){
   const i=props.findIndex(p=>p.id===propId);
   if(i<0)return;
   const p=props[i];
   const words=p.text.split(' ');
   if(wordIdx<1||wordIdx>=words.length)return;
+  // Save snapshot for undo
+  splitHistory.push(props.map(p=>({...p})));
   const L=words.slice(0,wordIdx).join(' ');
   const R=words.slice(wordIdx).join(' ');
   props.splice(i,1,
-    {id:++nextPId,text:L,verseNum:p.verseNum},
-    {id:++nextPId,text:R,verseNum:p.verseNum}
+    {id:++nextPId,text:L,verseNum:p.verseNum,subLabel:''},
+    {id:++nextPId,text:R,verseNum:p.verseNum,subLabel:''}
   );
   brackets=brackets.filter(b=>b.from!==propId&&b.to!==propId);
-  renderAll(); updateBracketList();
+  recomputeSubLabels();
+  renderAll(); updateAList();
+}
+
+function undoSplit(){
+  if(!splitHistory.length){flashInstr('Nothing to undo.');return}
+  props=splitHistory.pop();
+  // Remove brackets referencing ids that no longer exist
+  const ids=new Set(props.map(p=>p.id));
+  brackets=brackets.filter(b=>ids.has(b.from)&&ids.has(b.to));
+  recomputeSubLabels();
+  renderAll(); updateAList();
+}
+
+function autoSplit(){
+  if(!props.length)return;
+  splitHistory.push(props.map(p=>({...p})));
+  const next=[];
+  props.forEach(p=>{
+    const parts=smartSplit(p.text);
+    if(parts.length<=1){next.push({...p});return}
+    parts.forEach(t=>next.push({id:++nextPId,text:t,verseNum:p.verseNum,subLabel:''}));
+  });
+  props=next; brackets=[];
+  recomputeSubLabels();
+  renderAll(); updateAList();
+}
+
+function smartSplit(text){
+  let parts=text.split(/;\s*/);
+  parts=parts.flatMap(p=>{
+    const m=p.match(/^(.{8,}?),?\s+\b(for|because|so that|in order|when|if|although|therefore|but|and|that|who|which)\b\s+(.{5,})$/i);
+    if(m) return [m[1].trim(),(m[2]+' '+m[3]).trim()];
+    return [p];
+  });
+  return parts.map(s=>s.trim()).filter(Boolean);
 }
 
 function resetSplits(){
@@ -605,119 +457,102 @@ function resetSplits(){
   setupProps(currentRef,rawVerses);
 }
 
-// ── Selection ─────────────────────────────────
+// ─── Selection ───────────────────────────────────────────────────────────────
 function toggleSel(id){
   const i=selected.indexOf(id);
   if(i>=0) selected.splice(i,1);
-  else{
-    if(selected.length>=2) selected.shift();
-    selected.push(id);
-  }
-  document.querySelectorAll('.prop-row').forEach(row=>{
+  else{if(selected.length>=2)selected.shift();selected.push(id)}
+  document.querySelectorAll('.pr').forEach(row=>{
     const pid=parseInt(row.dataset.pid);
     row.classList.toggle('sel',selected.includes(pid));
     const cb=row.querySelector('.pcb');
-    if(cb) cb.checked=selected.includes(pid);
+    if(cb)cb.checked=selected.includes(pid);
   });
   updateMode();
 }
 
 function updateMode(){
-  const pill=document.getElementById('mode-pill');
+  const pill=document.getElementById('mpill');
   const instr=document.getElementById('instr');
   if(selected.length===0){
-    pill.className='chip cc';pill.textContent='Browse';
-    instr.innerHTML='1. Tap between words to split<br>2. Check 2 propositions<br>3. Tap a relationship';
+    pill.style.cssText='background:#192538;color:#6aaae0;border-color:#253550';pill.textContent='Browse';
+    instr.innerHTML='1. Hover between words to split<br>2. Check 2 propositions<br>3. Tap a relationship';
   }else if(selected.length===1){
-    pill.className='chip cd';pill.textContent='Arc: 1 of 2';
-    instr.innerHTML='<span style="color:var(--gold)">1 selected.</span><br>Now select a second proposition.';
+    pill.style.cssText='background:#2a1e10;color:#d4904a;border-color:#453020';pill.textContent='1 of 2';
+    instr.innerHTML='<span style="color:var(--gold)">1 selected.</span><br>Select a second proposition.';
   }else{
-    pill.className='chip cr';pill.textContent='Arc: ready';
-    instr.innerHTML='<span style="color:var(--gold)">2 selected.</span><br>Tap a relationship to bracket them.';
+    pill.style.cssText='background:#182818;color:#6aaa78;border-color:#254030';pill.textContent='Ready';
+    instr.innerHTML='<span style="color:var(--gold)">2 selected.</span><br>Tap a relationship.';
   }
 }
-function setMode(m){updateMode()}
+function setMode(){updateMode()}
 
-// ── Apply bracket ─────────────────────────────
+function flashInstr(msg){
+  const el=document.getElementById('instr');
+  const old=el.innerHTML;
+  el.innerHTML=`<span style="color:#d4a060">${msg}</span>`;
+  setTimeout(()=>el.innerHTML=old,2000);
+}
+
+// ─── Apply bracket ───────────────────────────────────────────────────────────
 function applyBracket(code){
-  if(selected.length!==2){
-    const instr=document.getElementById('instr');
-    const old=instr.innerHTML;
-    instr.innerHTML='<span style="color:#d4a060">Select 2 propositions first.</span>';
-    setTimeout(()=>instr.innerHTML=old,2000);
-    return;
-  }
-  const rel=RBC[code];
-  if(!rel)return;
+  if(selected.length!==2){flashInstr('Select 2 propositions first.');return}
+  const rel=RBC[code];if(!rel)return;
   brackets.push({id:nextBId++,from:selected[0],to:selected[1],code,color:CAT_COLOR[rel.cat]});
   selected=[];
-  renderAll(); updateBracketList(); setMode('browse');
-  if(window.innerWidth<=680) openSidebarBriefly();
-}
-
-function openSidebarBriefly(){
-  // flash arc list briefly on mobile so user sees it was added
-  const sb=document.getElementById('sidebar');
-  sb.classList.add('open');
-  setTimeout(()=>sb.classList.remove('open'),1500);
-}
-
-function deleteB(id){brackets=brackets.filter(b=>b.id!==id);renderAll();updateBracketList()}
-function clearArcs(){brackets=[];selected=[];renderAll();updateBracketList();setMode('browse')}
-
-// ── Render ────────────────────────────────────
-function renderAll(){
-  renderProps();
-  requestAnimationFrame(()=>requestAnimationFrame(()=>renderBrackets()));
-}
-
-// ── Render propositions ───────────────────────
-function renderProps(){
-  const area=document.getElementById('prop-area');
-  const svg=document.getElementById('bsvg');
-  const empty=document.getElementById('empty-msg');
-
-  // Remove all rows (keep svg and empty-msg)
-  Array.from(area.children).forEach(c=>{
-    if(c!==svg&&c!==empty) c.remove();
-  });
-
-  if(!props.length){
-    if(empty) empty.style.display='block';
-    return;
+  renderAll(); updateAList(); setMode();
+  if(window.innerWidth<=680){
+    const sb=document.getElementById('sidebar');
+    sb.classList.add('open');setTimeout(()=>sb.classList.remove('open'),1400);
   }
-  if(empty) empty.style.display='none';
+}
+function deleteB(id){brackets=brackets.filter(b=>b.id!==id);renderAll();updateAList()}
+function clearArcs(){brackets=[];selected=[];renderAll();updateAList();setMode()}
+
+// ─── Render ──────────────────────────────────────────────────────────────────
+function renderAll(){renderProps();requestAnimationFrame(()=>requestAnimationFrame(renderBrackets))}
+
+// ─── Render propositions ─────────────────────────────────────────────────────
+function renderProps(){
+  const area=document.getElementById('pa');
+  const svg=document.getElementById('bsvg');
+  const emsg=document.getElementById('emsg');
+  Array.from(area.children).forEach(c=>{if(c!==svg&&c!==emsg)c.remove()});
+  if(!props.length){if(emsg)emsg.style.display='block';return}
+  if(emsg)emsg.style.display='none';
 
   let lastV=null;
   props.forEach(p=>{
     const row=document.createElement('div');
-    row.className='prop-row'+(selected.includes(p.id)?' sel':'');
+    row.className='pr'+(selected.includes(p.id)?' sel':'');
     row.dataset.pid=p.id;
 
+    // Verse number column — show number only when verse changes
     const vn=document.createElement('div');
-    vn.className='vnum';
+    vn.className='vn';
     vn.textContent=(p.verseNum!==lastV)?p.verseNum:'';
     lastV=p.verseNum;
 
-    const cbw=document.createElement('div');
-    cbw.className='cbw';
-    const cb=document.createElement('input');
-    cb.type='checkbox'; cb.className='pcb';
+    // Sub-label column (a, b, c…)
+    const vs=document.createElement('div');
+    vs.className='vsub';
+    vs.textContent=p.subLabel||'';
+
+    // Checkbox
+    const cbw=document.createElement('div');cbw.className='cbw';
+    const cb=document.createElement('input');cb.type='checkbox';cb.className='pcb';
     cb.checked=selected.includes(p.id);
     cb.addEventListener('change',()=>toggleSel(p.id));
-    // Prevent tap on checkbox from bubbling to canvas click handler
     cb.addEventListener('click',e=>e.stopPropagation());
     cbw.appendChild(cb);
 
-    const ptc=document.createElement('div');
-    ptc.className='ptc';
-    const ti=document.createElement('div');
-    ti.className='prop-ti';
-    ti.id='pt-'+p.id;
+    // Text
+    const ptc=document.createElement('div');ptc.className='ptc';
+    const ti=document.createElement('div');ti.className='pti';ti.id='pt-'+p.id;
     buildWordSpans(ti,p);
     ptc.appendChild(ti);
 
-    row.appendChild(vn); row.appendChild(cbw); row.appendChild(ptc);
+    row.appendChild(vn);row.appendChild(vs);row.appendChild(cbw);row.appendChild(ptc);
     area.appendChild(row);
   });
 }
@@ -726,42 +561,60 @@ function buildWordSpans(container,prop){
   const words=prop.text.split(' ');
   words.forEach((word,wi)=>{
     if(wi>0){
-      const gap=document.createElement('span');
-      gap.className='sz';
+      const gap=document.createElement('span');gap.className='sz';
       gap.innerHTML=' <span class="sl">/</span>';
       gap.addEventListener('click',e=>{e.stopPropagation();splitAt(prop.id,wi)});
       container.appendChild(gap);
     }
-    const ws=document.createElement('span');
-    ws.textContent=word;
+    const ws=document.createElement('span');ws.textContent=word;
     container.appendChild(ws);
   });
 }
 
-// ── Render brackets ───────────────────────────
-const COL_W=26, TICK=7, GAP=8, VNUM_W=26, CB_W=18;
+// ─── Render brackets ─────────────────────────────────────────────────────────
+//
+// Layout:
+//   [col N-1]...[col 1][col 0] | [vnum][vsub][cb] | text text text
+//
+// col 0 = innermost (closest to text)
+// col N = outermost (farthest left)
+// Each col is COL_W px wide.
+// The bracket stem is at the RIGHT edge of its column slot.
+// Tick extends RIGHT toward the text.
+// Label sits LEFT of the stem within its column slot.
+//
+// Key fix: anchor y at TOP of row (offsetTop), not middle.
+// This ensures multi-line rows bracket from the top of the first line.
+//
+const COL_W=22;   // px per bracket column
+const TICK=6;     // tick length toward text
+const COL_GAP=2;  // gap between rightmost bracket and vnum column
+// Left of text content = bracketZoneW + COL_GAP + VNUM_W + VSUB_W + CB_W + INNER_PAD
+const VNUM_W=22, VSUB_W=20, CB_W=17, INNER_PAD=2;
+
 let _bd=[];
 
 function computeCols(){
-  const area=document.getElementById('prop-area');
+  const area=document.getElementById('pa');
   _bd=brackets.map(b=>{
-    const fr=area.querySelector(`.prop-row[data-pid="${b.from}"]`);
-    const to=area.querySelector(`.prop-row[data-pid="${b.to}"]`);
+    const fr=area.querySelector(`.pr[data-pid="${b.from}"]`);
+    const to=area.querySelector(`.pr[data-pid="${b.to}"]`);
     if(!fr||!to)return null;
-    const y1=fr.offsetTop+fr.offsetHeight*.5;
-    const y2=to.offsetTop+to.offsetHeight*.5;
-    return{b,y1:Math.min(y1,y2),y2:Math.max(y1,y2),col:0};
+    // Use TOP of row for y anchor (multi-line text alignment)
+    const y1=fr.offsetTop;
+    const y2=to.offsetTop+to.offsetHeight;
+    return{b,y1,y2,col:0};
   }).filter(Boolean);
 
-  // Largest spans first → they get outermost columns (highest col number)
+  // Largest spans → outermost (highest col index)
   _bd.sort((a,b)=>(b.y2-b.y1)-(a.y2-a.y1));
   _bd.forEach((cur,i)=>{
     const used=new Set();
     for(let j=0;j<i;j++){
       const o=_bd[j];
-      if(cur.y1<o.y2-1&&cur.y2>o.y1+1) used.add(o.col);
+      if(cur.y1<o.y2-1&&cur.y2>o.y1+1)used.add(o.col);
     }
-    let c=0; while(used.has(c))c++;
+    let c=0;while(used.has(c))c++;
     cur.col=c;
   });
   return _bd.reduce((m,d)=>Math.max(m,d?d.col+1:0),0);
@@ -769,22 +622,21 @@ function computeCols(){
 
 function renderBrackets(){
   const svg=document.getElementById('bsvg');
-  const area=document.getElementById('prop-area');
+  const area=document.getElementById('pa');
   svg.innerHTML='';
 
   if(!props.length){
-    area.style.paddingLeft=(VNUM_W+CB_W+GAP)+'px';
-    svg.style.width='0'; svg.style.height='0';
+    area.style.paddingLeft=(VNUM_W+VSUB_W+CB_W+INNER_PAD)+'px';
+    svg.style.width='0';svg.style.height='0';
     return;
   }
 
   const nCols=computeCols();
-  const bracketW=nCols*COL_W;
-  const leftPad=bracketW+GAP+VNUM_W+CB_W;
+  const bZoneW=nCols>0?nCols*COL_W+COL_GAP:COL_GAP;
+  const leftPad=bZoneW+VNUM_W+VSUB_W+CB_W+INNER_PAD;
 
   area.style.paddingLeft=leftPad+'px';
-  // Force reflow so offsetTop values update
-  void area.offsetHeight;
+  void area.offsetHeight; // force reflow
 
   const svgH=area.offsetHeight;
   const svgW=leftPad;
@@ -795,131 +647,131 @@ function renderBrackets(){
   _bd.forEach(d=>{
     if(!d)return;
     const{b,col}=d;
-    const fr=area.querySelector(`.prop-row[data-pid="${b.from}"]`);
-    const to=area.querySelector(`.prop-row[data-pid="${b.to}"]`);
+    const fr=area.querySelector(`.pr[data-pid="${b.from}"]`);
+    const to=area.querySelector(`.pr[data-pid="${b.to}"]`);
     if(!fr||!to)return;
 
-    const y1=fr.offsetTop+fr.offsetHeight*.5;
-    const y2=to.offsetTop+to.offsetHeight*.5;
+    // y1 = top of first row, y2 = bottom of last row
+    const y1=fr.offsetTop+2;       // +2px top inset
+    const y2=to.offsetTop+to.offsetHeight-2; // -2px bottom inset
     const mid=(y1+y2)/2;
 
-    // col 0 = innermost (rightmost, closest to text)
-    // col N = outermost (leftmost)
-    // Stem x: right edge of bracket zone minus column offset
-    // Rightmost col (0): stemX = bracketW - COL_W*0.3
-    // Next col (1): stemX = bracketW - COL_W - COL_W*0.3
-    const stemX=bracketW-col*COL_W-COL_W*.35;
+    // Stem x within the SVG coordinate space:
+    // The rightmost bracket (col 0) has its stem at x = bZoneW - COL_GAP - (0+0.5)*COL_W... no.
+    // Simpler: col 0 stem is at bZoneW - COL_GAP - 1 (right edge of bracket zone, 1px from gap)
+    // col 1 stem is one column width to the left, etc.
+    const stemX=bZoneW-COL_GAP-1-col*COL_W;
 
-    const c=b.color,sw=1.6;
-    line(svg,stemX,y1,stemX,y2,c,sw);         // vertical stem
-    line(svg,stemX,y1,stemX+TICK,y1,c,sw);    // top tick →
-    line(svg,stemX,y2,stemX+TICK,y2,c,sw);    // bottom tick →
-
-    // Label pill left of stem
     const lbl=b.code;
-    const fw=Math.max(16,lbl.length*5.6+8), fh=13;
-    const lx=stemX-4;
-    rect(svg,lx-fw,mid-fh/2,fw,fh,c+'1a',c+'66',2);
+    const lcolor=b.color;  // label color only
+    const stemColor='#555550'; // all stems are dark neutral
 
-    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-    t.setAttribute('x',lx-fw/2); t.setAttribute('y',mid);
-    t.setAttribute('text-anchor','middle');
-    t.setAttribute('dominant-baseline','central');
-    t.setAttribute('fill',c);
-    t.setAttribute('font-size','9');
-    t.setAttribute('font-family','Georgia,serif');
-    t.setAttribute('font-style','italic');
+    // ── Vertical stem ──
+    line(svg,stemX,y1,stemX,y2,stemColor,1.5);
+
+    // ── Top tick → ──
+    line(svg,stemX,y1,stemX+TICK,y1,stemColor,1.5);
+
+    // ── Bottom tick → ──
+    line(svg,stemX,y2,stemX+TICK,y2,stemColor,1.5);
+
+    // ── Label: inside the column, left of stem, colored ──
+    const fw=Math.max(14,lbl.length*5.4+7), fh=13;
+    const lx=stemX-3; // right edge of label area
+
+    // Clip label to stay within SVG (don't go below x=0)
+    const lLeft=Math.max(1,lx-fw);
+    const actualFw=lx-lLeft;
+
+    // Background tinted with label color
+    rect(svg,lLeft,mid-fh/2,actualFw,fh,lcolor+'14',lcolor+'44',2);
+
+    const t=mkText(svg,lLeft+actualFw/2,mid,lbl,lcolor,8.5);
     t.setAttribute('font-weight','700');
-    t.textContent=lbl;
-    svg.appendChild(t);
+    t.setAttribute('font-style','italic');
   });
 }
 
-function line(svg,x1,y1,x2,y2,stroke,sw=1.5){
+function line(svg,x1,y1,x2,y2,stroke,sw){
   const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-  l.setAttribute('x1',x1);l.setAttribute('y1',y1);
-  l.setAttribute('x2',x2);l.setAttribute('y2',y2);
-  l.setAttribute('stroke',stroke);l.setAttribute('stroke-width',sw);
-  l.setAttribute('stroke-linecap','round');
+  l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+  l.setAttribute('stroke',stroke);l.setAttribute('stroke-width',sw);l.setAttribute('stroke-linecap','round');
   svg.appendChild(l);
 }
 function rect(svg,x,y,w,h,fill,stroke,rx){
   const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
-  r.setAttribute('x',x);r.setAttribute('y',y);
-  r.setAttribute('width',w);r.setAttribute('height',h);
-  r.setAttribute('fill',fill);r.setAttribute('stroke',stroke);
-  r.setAttribute('stroke-width','0.75');r.setAttribute('rx',rx);
+  r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);
+  r.setAttribute('fill',fill);r.setAttribute('stroke',stroke);r.setAttribute('stroke-width','0.7');r.setAttribute('rx',rx);
   svg.appendChild(r);
 }
+function mkText(svg,x,y,txt,fill,size){
+  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('text-anchor','middle');
+  t.setAttribute('dominant-baseline','central');t.setAttribute('fill',fill);
+  t.setAttribute('font-size',size);t.setAttribute('font-family','Georgia,serif');
+  t.textContent=txt;svg.appendChild(t);return t;
+}
 
-// ── Bracket list ──────────────────────────────
-function updateBracketList(){
-  const el=document.getElementById('arc-list');
+// ─── Bracket list ────────────────────────────────────────────────────────────
+function updateAList(){
+  const el=document.getElementById('alist');
   if(!brackets.length){el.innerHTML='<div class="help">None yet.</div>';return}
   el.innerHTML='';
   [...brackets].reverse().forEach(b=>{
     const fp=props.find(p=>p.id===b.from);
     const tp=props.find(p=>p.id===b.to);
-    const item=document.createElement('div');
-    item.className='arc-item';
+    const fLabel=fp?(fp.verseNum+(fp.subLabel||'')):'?';
+    const tLabel=tp?(tp.verseNum+(tp.subLabel||'')):'?';
+    const item=document.createElement('div');item.className='arc-item';
     item.innerHTML=`
-      <div style="display:flex;align-items:center;gap:6px">
-        <div class="arc-dot" style="background:${b.color}"></div>
+      <div style="display:flex;align-items:center;gap:5px">
+        <div class="adot" style="background:${b.color}"></div>
         <span style="color:${b.color};font-weight:700">${b.code}</span>
-        <span style="color:#6a6460">${fp?'v'+fp.verseNum:'?'} – ${tp?'v'+tp.verseNum:'?'}</span>
+        <span style="color:#666460;font-size:.67rem">v${fLabel} – v${tLabel}</span>
       </div>
-      <button class="arc-del" onclick="deleteB(${b.id})">✕</button>`;
+      <button class="adel" onclick="deleteB(${b.id})">✕</button>`;
     el.appendChild(item);
   });
 }
 
-// ── Export ────────────────────────────────────
+// ─── Export ──────────────────────────────────────────────────────────────────
 function setBg(mode,val){
-  exportBg=mode; exportBgColor=val||null;
+  exportBg=mode;exportBgColor=val||null;
   document.querySelectorAll('.bgsw').forEach(s=>s.classList.remove('on'));
-  const el=document.getElementById('bgsw-'+mode)||document.getElementById('bgsw-c');
-  if(el) el.classList.add('on');
+  (document.getElementById('bgsw-'+mode)||document.getElementById('bgsw-c')).classList.add('on');
 }
-
 async function exportPNG(){
-  const ws=document.getElementById('workspace');
+  const ws=document.getElementById('ws');
   const btn=document.querySelector('[onclick="exportPNG()"]');
-  btn.textContent='Exporting…'; btn.disabled=true;
+  btn.textContent='Exporting…';btn.disabled=true;
   const bgMap={t:null,p:'#f9f6f0',w:'#ffffff',d:'#1a1810'};
   const bg=exportBg==='c'?exportBgColor:(bgMap[exportBg]??null);
   try{
     const canvas=await html2canvas(ws,{scale:2,useCORS:true,backgroundColor:bg,logging:false});
     const a=document.createElement('a');
     a.download=(currentRef.replace(/[\s:]/g,'-')||'arc')+'.png';
-    a.href=canvas.toDataURL('image/png'); a.click();
+    a.href=canvas.toDataURL('image/png');a.click();
   }catch(e){showErr('Export failed: '+e.message)}
-  btn.textContent='Export PNG'; btn.disabled=false;
+  btn.textContent='Export PNG';btn.disabled=false;
 }
 
-// ── UI helpers ────────────────────────────────
+// ─── UI helpers ──────────────────────────────────────────────────────────────
 function showLoading(){
-  document.getElementById('ws-top').style.display='none';
-  const area=document.getElementById('prop-area');
-  const svg=document.getElementById('bsvg');
-  const empty=document.getElementById('empty-msg');
-  Array.from(area.children).forEach(c=>{if(c!==svg&&c!==empty)c.remove()});
-  if(empty){empty.style.display='block';empty.innerHTML='<div class="loading"><div class="spin"></div>Loading…</div>'}
+  document.getElementById('wstop').style.display='none';
+  const area=document.getElementById('pa'),svg=document.getElementById('bsvg'),emsg=document.getElementById('emsg');
+  Array.from(area.children).forEach(c=>{if(c!==svg&&c!==emsg)c.remove()});
+  if(emsg){emsg.style.display='block';emsg.innerHTML='<div class="loading"><div class="spin"></div>Loading…</div>'}
 }
 function showEmpty(){
-  const empty=document.getElementById('empty-msg');
-  if(empty){empty.style.display='block';empty.innerHTML='Enter a reference above to begin.'}
+  const e=document.getElementById('emsg');
+  if(e){e.style.display='block';e.innerHTML='Enter a reference above to begin.'}
 }
 function showErr(msg){
-  const el=document.getElementById('err-box');
-  el.innerHTML=`<div class="err-box">${msg}</div>`;
-  setTimeout(()=>el.innerHTML='',6000);
+  document.getElementById('ebox').innerHTML=`<div class="ebox">${msg}</div>`;
+  setTimeout(()=>document.getElementById('ebox').innerHTML='',6000);
 }
-function clearErr(){document.getElementById('err-box').innerHTML=''}
-function showTT(e,html){
-  const tt=document.getElementById('tt');
-  tt.innerHTML=html;tt.style.opacity='1';
-  tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY+10)+'px';
-}
+function clearErr(){document.getElementById('ebox').innerHTML=''}
+function showTT(e,html){const tt=document.getElementById('tt');tt.innerHTML=html;tt.style.opacity='1';tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY+10)+'px'}
 function hideTT(){document.getElementById('tt').style.opacity='0'}
 </script>
 </body>
