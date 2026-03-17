@@ -14,17 +14,22 @@ export default function ExportPanel({ workspaceRef, exportBg, setExportBg, expor
     link.click();
   };
 
+  const preset = ['transparent', '#f8f5ef', '#ffffff', '#171717'].includes(exportBg) ? exportBg : 'custom';
+
   return (
     <div className="space-y-3 text-sm text-stone-200">
       <div>
         <label className="mb-1 block text-xs uppercase tracking-[0.18em] text-stone-400">Background</label>
-        <select value={exportBg} onChange={(e) => setExportBg(e.target.value)} className="w-full rounded-md border border-stone-600 bg-stone-900 px-3 py-2">
+        <select value={preset} onChange={(e) => setExportBg(e.target.value === 'custom' ? '#d6c7a5' : e.target.value)} className="w-full rounded-md border border-stone-600 bg-stone-900 px-3 py-2">
           <option value="transparent">Transparent</option>
           <option value="#f8f5ef">Paper</option>
           <option value="#ffffff">White</option>
           <option value="#171717">Dark</option>
+          <option value="custom">Custom</option>
         </select>
       </div>
+      <label className="block text-xs uppercase tracking-[0.18em] text-stone-400">Custom color</label>
+      <input type="color" value={exportBg === 'transparent' ? '#f8f5ef' : exportBg} onChange={(e) => setExportBg(e.target.value)} className="h-10 w-full rounded-md border border-stone-600 bg-stone-900 p-1" />
       <label className="flex items-center gap-2">
         <input type="checkbox" checked={exportLegend} onChange={(e) => setExportLegend(e.target.checked)} />
         Export with legend

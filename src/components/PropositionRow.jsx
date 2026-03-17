@@ -1,15 +1,21 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-export default function PropositionRow({ prop, selected, onSelect, onMeasure, onSplit }) {
+export default function PropositionRow({ prop, selected, onSelect, onMeasure, onSplit, showVerseNumber, containerRef }) {
   const ref = useRef(null);
   const [hoverIndex, setHoverIndex] = useState(null);
   const tokens = useMemo(() => prop.text.split(/\s+/).filter(Boolean), [prop.text]);
 
   useLayoutEffect(() => {
     const measure = () => {
-      if (!ref.current) return;
-      onMeasure(prop.id, { top: ref.current.offsetTop, height: ref.current.offsetHeight });
+      if (!ref.current || !containerRef.current) return;
+      const rowRect = ref.current.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
+      onMeasure(prop.id, {
+        top: rowRect.top - containerRect.top + containerRef.current.scrollTop,
+        height: rowRect.height,
+      });
     };
+
     measure();
     const observer = new ResizeObserver(measure);
     if (ref.current) observer.observe(ref.current);
@@ -18,7 +24,7 @@ export default function PropositionRow({ prop, selected, onSelect, onMeasure, on
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [onMeasure, prop.id, prop.text]);
+  }, [containerRef, onMeasure, prop.id, prop.text]);
 
   return (
     <div
@@ -27,7 +33,7 @@ export default function PropositionRow({ prop, selected, onSelect, onMeasure, on
       className={`group mb-1.5 flex cursor-pointer items-stretch gap-3 rounded-[3px] border border-[#d0c8b4] px-3 py-2 transition ${selected ? 'bg-[rgba(184,150,62,0.13)]' : 'hover:bg-[rgba(184,150,62,0.06)]'}`}
     >
       <div className="w-14 shrink-0 pt-1 text-right text-sm text-stone-500">
-        <span className="inline-block min-w-8">{prop.verseNum}</span>
+        <span className="inline-block min-w-8">{showVerseNumber ? prop.verseNum : ''}</span>
         {prop.subLabel && <span>{prop.subLabel}</span>}
       </div>
       <div className="min-w-0 flex-1 font-body text-[1rem] leading-[1.7] text-stone-800">

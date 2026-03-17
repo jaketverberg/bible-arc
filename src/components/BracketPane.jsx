@@ -17,6 +17,13 @@ export default function BracketPane({ brackets, paneWidth, paneHeight, onUpdate,
     return inner ? inner.stemX : target.stemX + 10;
   };
 
+  const popoverStyle = active
+    ? {
+        left: Math.max(8, Math.min((active.stemX || 24) + 12, paneWidth - 260)),
+        top: Math.max(8, (active.yTop || 0) - 4),
+      }
+    : null;
+
   return (
     <div className="relative border-r border-stone-300 bg-paper/70" style={{ width: paneWidth, minWidth: paneWidth }}>
       <svg width={paneWidth} height={Math.max(paneHeight, 200)} className="overflow-visible">
@@ -26,7 +33,7 @@ export default function BracketPane({ brackets, paneWidth, paneHeight, onUpdate,
           const rel = REL_BY_CODE[bracket.code];
           const labels = bracket.flipped ? [...rel.labels].reverse() : rel.labels;
           return (
-            <g key={bracket.id} onMouseLeave={() => setActiveId((id) => id === bracket.id ? null : id)}>
+            <g key={bracket.id} onMouseLeave={() => setActiveId((id) => (id === bracket.id ? null : id))}>
               <line x1={bracket.stemX} y1={bracket.yTop} x2={bracket.stemX} y2={bracket.yBottom} stroke="#3a3830" strokeWidth="2" />
               <line x1={bracket.stemX} y1={bracket.yTop} x2={topX2} y2={bracket.yTop} stroke="#3a3830" strokeWidth="2" className="cursor-pointer" onClick={() => setActiveId(bracket.id)} />
               <line x1={bracket.stemX} y1={bracket.yBottom} x2={bottomX2} y2={bracket.yBottom} stroke="#3a3830" strokeWidth="2" className="cursor-pointer" onClick={() => setActiveId(bracket.id)} />
@@ -50,13 +57,13 @@ export default function BracketPane({ brackets, paneWidth, paneHeight, onUpdate,
           );
         })}
       </svg>
-      {active && (
-        <div className="absolute left-2 top-2 z-10 w-64 rounded-lg border border-stone-300 bg-white p-3 shadow-xl">
+      {active && popoverStyle && (
+        <div className="absolute z-10 w-64 rounded-lg border border-stone-300 bg-white p-3 shadow-xl" style={popoverStyle}>
           <div className="mb-2 flex items-center justify-between">
             <div className="font-semibold">Edit bracket</div>
             <button onClick={() => setActiveId(null)} className="text-stone-500">×</button>
           </div>
-          <div className="space-y-2 max-h-72 overflow-auto pr-1">
+          <div className="max-h-72 space-y-2 overflow-auto pr-1">
             {REL_GROUPS.map((group) => (
               <div key={group.category}>
                 <div className="mb-1 text-xs uppercase tracking-[0.18em] text-stone-500">{group.category}</div>

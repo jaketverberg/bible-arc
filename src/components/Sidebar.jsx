@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import RelationshipPalette from './RelationshipPalette';
 import BracketList from './BracketList';
 import ExportPanel from './ExportPanel';
@@ -29,12 +30,14 @@ export default function Sidebar({
   exportLegend,
   setExportLegend,
 }) {
-  return (
-    <aside className="no-print w-full shrink-0 bg-sidebar text-stone-100 lg:w-[270px] lg:min-w-[270px]">
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const content = (
+    <>
       <div className="border-b border-stone-800 bg-sidebarHeader px-4 py-4">
         <div className="text-xl font-semibold">Bible Arcing</div>
       </div>
-      <div className="h-full space-y-6 overflow-auto px-4 py-4">
+      <div className="h-full space-y-6 overflow-auto px-4 py-4 pb-24 lg:pb-4">
         <section>
           <div className="mb-2 text-xs uppercase tracking-[0.18em] text-stone-400">Passage</div>
           <div className="space-y-2">
@@ -69,6 +72,7 @@ export default function Sidebar({
         <section>
           <div className="mb-2 text-xs uppercase tracking-[0.18em] text-stone-400">Relationships</div>
           <RelationshipPalette selectedCount={selected.length} onApply={onApplyRelation} />
+          <p className="mt-2 text-xs text-stone-400">To apply Ground or Inference to a single verse&apos;s content, split the verse first.</p>
         </section>
 
         <section>
@@ -87,6 +91,27 @@ export default function Sidebar({
           />
         </section>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      <aside className="no-print hidden shrink-0 bg-sidebar text-stone-100 lg:block lg:w-[270px] lg:min-w-[270px]">
+        {content}
+      </aside>
+
+      <div className="no-print lg:hidden">
+        <button
+          onClick={() => setMobileOpen((v) => !v)}
+          className="fixed bottom-4 right-4 z-40 rounded-full bg-sidebar px-4 py-3 text-sm font-semibold text-stone-100 shadow-xl"
+        >
+          {mobileOpen ? 'Close tools' : 'Open tools'}
+        </button>
+        {mobileOpen && <div className="fixed inset-0 z-40 bg-black/35" onClick={() => setMobileOpen(false)} />}
+        <aside className={`fixed inset-x-0 bottom-0 z-50 max-h-[85vh] rounded-t-2xl bg-sidebar text-stone-100 shadow-2xl transition-transform ${mobileOpen ? 'translate-y-0' : 'translate-y-full'}`}>
+          {content}
+        </aside>
+      </div>
+    </>
   );
 }

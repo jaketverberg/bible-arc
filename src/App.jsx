@@ -21,7 +21,7 @@ function WorkspacePage() {
   }, [arcing.rowRects]);
 
   return (
-    <div className="min-h-screen bg-paper text-stone-900 lg:flex">
+    <div className="min-h-screen bg-paper pb-20 text-stone-900 lg:flex lg:pb-0">
       <Sidebar
         currentRef={arcing.currentRef}
         setCurrentRef={arcing.setCurrentRef}
