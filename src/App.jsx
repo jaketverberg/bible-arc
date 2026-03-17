@@ -13,7 +13,11 @@ function WorkspacePage() {
   const [showKeyModal, setShowKeyModal] = useState(!arcing.esvKey);
   const [exportBg, setExportBg] = useState('#f8f5ef');
   const [exportLegend, setExportLegend] = useState(true);
+  const [showLegend, setShowLegend] = useState(false);
+  const [printLegend, setPrintLegend] = useState(true);
+
   const workspaceRef = useRef(null);
+
   const textPaneHeight = useMemo(() => {
     const values = Object.values(arcing.rowRects);
     if (!values.length) return 300;
@@ -42,10 +46,21 @@ function WorkspacePage() {
         setExportBg={setExportBg}
         exportLegend={exportLegend}
         setExportLegend={setExportLegend}
+        showLegend={showLegend}
+        setShowLegend={setShowLegend}
+        printLegend={printLegend}
+        setPrintLegend={setPrintLegend}
       />
+
       <main className="min-w-0 flex-1">
         <WorkspaceHeader currentRef={arcing.currentRef} />
-        {arcing.error && <div className="mx-4 mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">{arcing.error}</div>}
+
+        {arcing.error && (
+          <div className="mx-4 mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {arcing.error}
+          </div>
+        )}
+
         <div ref={workspaceRef} style={{ background: exportBg }} className="overflow-x-auto">
           <div className="flex min-w-full items-start">
             <BracketPane
@@ -55,18 +70,36 @@ function WorkspacePage() {
               onUpdate={arcing.updateBracket}
               onDelete={arcing.deleteBracket}
               onFlip={arcing.flipBracket}
+              rowAnchors={arcing.rowAnchors}
+              nCols={arcing.bracketLayout.nCols}
+              pendingAnchor={arcing.pendingAnchor}
+              onAnchorClick={arcing.handleAnchorClick}
             />
+
             <TextPane
               props={arcing.props}
               selected={arcing.selected}
               onSelect={arcing.toggleSelection}
               onMeasure={arcing.setRowMeasurement}
               onSplit={arcing.splitProposition}
+              onMerge={arcing.mergeWithPrevious}
             />
           </div>
-          {exportLegend && <div className="p-4"><Legend /></div>}
+
+          {showLegend && (
+            <div className="p-4">
+              <Legend />
+            </div>
+          )}
+
+          {printLegend && !showLegend && (
+            <div className="hidden print:block p-4">
+              <Legend />
+            </div>
+          )}
         </div>
       </main>
+
       <KeyModal
         open={showKeyModal}
         value={arcing.esvKey}

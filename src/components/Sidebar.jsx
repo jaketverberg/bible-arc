@@ -4,7 +4,7 @@ import BracketList from './BracketList';
 import ExportPanel from './ExportPanel';
 
 function instructions(selectedCount) {
-  if (selectedCount === 0) return 'Hover between words to split a proposition, then click a row to select it.';
+  if (selectedCount === 0) return 'Hover between words to split a proposition, click a faint circle or a row to select it.';
   if (selectedCount === 1) return 'Select one more proposition to define the bracket span.';
   return 'Now click a relationship chip to apply the bracket.';
 }
@@ -29,6 +29,10 @@ export default function Sidebar({
   setExportBg,
   exportLegend,
   setExportLegend,
+  showLegend,
+  setShowLegend,
+  printLegend,
+  setPrintLegend,
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -37,6 +41,7 @@ export default function Sidebar({
       <div className="border-b border-stone-800 bg-sidebarHeader px-4 py-4">
         <div className="text-xl font-semibold">Bible Arcing</div>
       </div>
+
       <div className="h-full space-y-6 overflow-auto px-4 py-4 pb-24 lg:pb-4">
         <section>
           <div className="mb-2 text-xs uppercase tracking-[0.18em] text-stone-400">Passage</div>
@@ -49,30 +54,48 @@ export default function Sidebar({
               placeholder="Philippians 1:3-11"
             />
             <div className="flex gap-2">
-              <button onClick={() => onLoad(currentRef)} disabled={loading} className="rounded-md bg-gold px-3 py-2 text-sm font-semibold text-stone-900 disabled:opacity-60">{loading ? 'Loading...' : 'Load'}</button>
-              <button onClick={onShowKey} className="rounded-md border border-stone-600 px-3 py-2 text-sm">Change Key</button>
+              <button
+                onClick={() => onLoad(currentRef)}
+                disabled={loading}
+                className="rounded-md bg-gold px-3 py-2 text-sm font-semibold text-stone-900 disabled:opacity-60"
+              >
+                {loading ? 'Loading...' : 'Load'}
+              </button>
+              <button onClick={onShowKey} className="rounded-md border border-stone-600 px-3 py-2 text-sm">
+                Change Key
+              </button>
             </div>
           </div>
         </section>
 
         <section>
           <div className="mb-2 text-xs uppercase tracking-[0.18em] text-stone-400">Instructions</div>
-          <div className="rounded-lg border border-stone-700 bg-stone-900/60 p-3 text-sm text-stone-300">{instructions(selected.length)}</div>
+          <div className="rounded-lg border border-stone-700 bg-stone-900/60 p-3 text-sm text-stone-300">
+            {instructions(selected.length)}
+          </div>
         </section>
 
         <section>
           <div className="mb-2 text-xs uppercase tracking-[0.18em] text-stone-400">Splits</div>
           <div className="flex flex-wrap gap-2">
-            <button onClick={onUndoSplit} className="rounded-md border border-stone-600 px-3 py-2 text-sm">Undo last split</button>
-            <button onClick={onAutoSplit} className="rounded-md border border-stone-600 px-3 py-2 text-sm">Auto-split</button>
-            <button onClick={onResetSplits} className="rounded-md border border-stone-600 px-3 py-2 text-sm">Reset splits</button>
+            <button onClick={onUndoSplit} className="rounded-md border border-stone-600 px-3 py-2 text-sm">
+              Undo last split
+            </button>
+            <button onClick={onAutoSplit} className="rounded-md border border-stone-600 px-3 py-2 text-sm">
+              Auto-split
+            </button>
+            <button onClick={onResetSplits} className="rounded-md border border-stone-600 px-3 py-2 text-sm">
+              Reset splits
+            </button>
           </div>
         </section>
 
         <section>
           <div className="mb-2 text-xs uppercase tracking-[0.18em] text-stone-400">Relationships</div>
           <RelationshipPalette selectedCount={selected.length} onApply={onApplyRelation} />
-          <p className="mt-2 text-xs text-stone-400">To apply Ground or Inference to a single verse&apos;s content, split the verse first.</p>
+          <p className="mt-2 text-xs text-stone-400">
+            To apply Ground or Inference to a single verse&apos;s content, split the verse first.
+          </p>
         </section>
 
         <section>
@@ -88,6 +111,10 @@ export default function Sidebar({
             setExportBg={setExportBg}
             exportLegend={exportLegend}
             setExportLegend={setExportLegend}
+            showLegend={showLegend}
+            setShowLegend={setShowLegend}
+            printLegend={printLegend}
+            setPrintLegend={setPrintLegend}
           />
         </section>
       </div>
@@ -108,7 +135,11 @@ export default function Sidebar({
           {mobileOpen ? 'Close tools' : 'Open tools'}
         </button>
         {mobileOpen && <div className="fixed inset-0 z-40 bg-black/35" onClick={() => setMobileOpen(false)} />}
-        <aside className={`fixed inset-x-0 bottom-0 z-50 max-h-[85vh] rounded-t-2xl bg-sidebar text-stone-100 shadow-2xl transition-transform ${mobileOpen ? 'translate-y-0' : 'translate-y-full'}`}>
+        <aside
+          className={`fixed inset-x-0 bottom-0 z-50 max-h-[85vh] rounded-t-2xl bg-sidebar text-stone-100 shadow-2xl transition-transform ${
+            mobileOpen ? 'translate-y-0' : 'translate-y-full'
+          }`}
+        >
           {content}
         </aside>
       </div>

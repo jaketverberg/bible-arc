@@ -45,7 +45,9 @@ function assignBracketColumns(brackets, propOrderMap) {
   const withCols = normalized.map((bracket) => {
     let col = 0;
     while (true) {
-      const conflict = (columns[col] || []).some((placed) => !(bracket.bottomIndex < placed.topIndex || bracket.topIndex > placed.bottomIndex));
+      const conflict = (columns[col] || []).some(
+        (placed) => !(bracket.bottomIndex < placed.topIndex || bracket.topIndex > placed.bottomIndex)
+      );
       if (!conflict) break;
       col += 1;
     }
@@ -78,6 +80,8 @@ export function useArcing() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rowRects, setRowRects] = useState({});
+  const [pendingAnchor, setPendingAnchor] = useState(null);
+
   const nextPropId = useRef(1000);
   const nextBracketId = useRef(1);
 
@@ -93,8 +97,10 @@ export function useArcing() {
       setError('Please add an ESV API key first.');
       return;
     }
+
     setLoading(true);
     setError('');
+
     try {
       const verses = await fetchPassage(reference, esvKey);
       const initialProps = parseInitialProps(verses);
@@ -103,6 +109,8 @@ export function useArcing() {
       setBrackets([]);
       setSelected([]);
       setSplitHistory([]);
+      setRowRects({});
+      setPendingAnchor(null);
       setCurrentRef(reference);
       nextPropId.current = 1000;
       nextBracketId.current = 1;
@@ -118,6 +126,7 @@ export function useArcing() {
   }, []);
 
   const toggleSelection = useCallback((propId) => {
+    setPendingAnchor(null);
     setSelected((prev) => {
       if (prev.includes(propId)) return prev.filter((id) => id !== propId);
       if (prev.length >= 2) return [prev[1], propId];
@@ -125,49 +134,89 @@ export function useArcing() {
     });
   }, []);
 
-  const snapshotSplit = useCallback(() => {
-    setSplitHistory((prev) => [...prev, props.map((prop) => ({ ...prop }))]);
-  }, [props]);
-
   const splitProposition = useCallback((propId, wordIndex) => {
     setProps((current) => {
       const idx = current.findIndex((prop) => prop.id === propId);
       if (idx === -1) return current;
+
       const target = current[idx];
       const words = target.text.split(/\s+/).filter(Boolean);
       if (wordIndex <= 0 || wordIndex >= words.length) return current;
+
       setSplitHistory((prev) => [...prev, current.map((prop) => ({ ...prop }))]);
+
       const left = words.slice(0, wordIndex).join(' ').trim();
       const right = words.slice(wordIndex).join(' ').trim();
+
       const replacement = [
         { ...target, text: left },
         { ...target, id: nextPropId.current++, text: right },
       ];
+
       const merged = [...current.slice(0, idx), ...replacement, ...current.slice(idx + 1)];
       return recomputeSubLabels(merged);
+    });
+  }, []);
+
+  const mergeWithPrevious = useCallback((propId) => {
+    setProps((current) => {
+      const idx = current.findIndex((prop) => prop.id === propId);
+      if (idx <= 0) return current;
+
+      const currentProp = current[idx];
+      const prevProp = current[idx - 1];
+
+      if (currentProp.verseNum !== prevProp.verseNum) return current;
+
+      setSplitHistory((prev) => [...prev, current.map((prop) => ({ ...prop }))]);
+
+      const mergedProps = [
+        ...current.slice(0, idx - 1),
+        {
+          ...prevProp,
+          text: `${prevProp.text} ${currentProp.text}`.replace(/\s+/g, ' ').trim(),
+        },
+        ...current.slice(idx + 1),
+      ];
+
+      setBrackets((prev) =>
+        prev.filter((br) => br.from !== currentProp.id && br.to !== currentProp.id)
+      );
+
+      setSelected((prev) => prev.filter((id) => id !== currentProp.id));
+
+      return recomputeSubLabels(mergedProps);
     });
   }, []);
 
   const autoSplit = useCallback(() => {
     setProps((current) => {
       setSplitHistory((prev) => [...prev, current.map((prop) => ({ ...prop }))]);
+
       const next = [];
       current.forEach((prop) => {
-        const bits = prop.text.split(majorSplitPattern).map((part) => part?.trim()).filter(Boolean);
+        const bits = prop.text
+          .split(majorSplitPattern)
+          .map((part) => part?.trim())
+          .filter(Boolean);
+
         if (bits.length <= 1) {
           next.push(prop);
           return;
         }
+
         const merged = [];
         for (let i = 0; i < bits.length; i += 2) {
           const first = bits[i] || '';
           const second = bits[i + 1] || '';
           merged.push(`${first}${second}`.trim());
         }
+
         if (merged.length <= 1) {
           next.push(prop);
           return;
         }
+
         merged.forEach((text, index) => {
           next.push({
             ...prop,
@@ -176,6 +225,7 @@ export function useArcing() {
           });
         });
       });
+
       return recomputeSubLabels(next);
     });
   }, []);
@@ -186,6 +236,8 @@ export function useArcing() {
     setSplitHistory([]);
     setSelected([]);
     setBrackets([]);
+    setPendingAnchor(null);
+    setRowRects({});
   }, [rawVerses]);
 
   const undoSplit = useCallback(() => {
@@ -199,57 +251,101 @@ export function useArcing() {
 
   const addBracket = useCallback((code) => {
     if (selected.length !== 2) return;
+
     const rel = REL_BY_CODE[code];
     if (!rel) return;
+
     const normalized = normalizeBracket(selected[0], selected[1]);
-    const alreadyExists = brackets.some((br) => br.from === normalized.from && br.to === normalized.to && br.code === code);
+    const alreadyExists = brackets.some(
+      (br) => br.from === normalized.from && br.to === normalized.to && br.code === code
+    );
     if (alreadyExists) return;
-    setBrackets((prev) => [...prev, {
-      id: nextBracketId.current++,
-      from: normalized.from,
-      to: normalized.to,
-      code,
-      color: CATEGORY_COLORS[rel.category],
-      flipped: false,
-    }]);
+
+    setBrackets((prev) => [
+      ...prev,
+      {
+        id: nextBracketId.current++,
+        from: normalized.from,
+        to: normalized.to,
+        code,
+        color: CATEGORY_COLORS[rel.category],
+        flipped: false,
+      },
+    ]);
+
     setSelected([]);
+    setPendingAnchor(null);
   }, [selected, brackets]);
 
   const updateBracket = useCallback((bracketId, updates) => {
-    setBrackets((prev) => prev.map((bracket) => {
-      if (bracket.id !== bracketId) return bracket;
-      const code = updates.code || bracket.code;
-      const rel = REL_BY_CODE[code];
-      return {
-        ...bracket,
-        ...updates,
-        color: CATEGORY_COLORS[rel.category],
-      };
-    }));
+    setBrackets((prev) =>
+      prev.map((bracket) => {
+        if (bracket.id !== bracketId) return bracket;
+        const code = updates.code || bracket.code;
+        const rel = REL_BY_CODE[code];
+        return {
+          ...bracket,
+          ...updates,
+          color: CATEGORY_COLORS[rel.category],
+        };
+      })
+    );
   }, []);
 
   const flipBracket = useCallback((bracketId) => {
-    setBrackets((prev) => prev.map((br) => br.id === bracketId ? { ...br, flipped: !br.flipped } : br));
+    setBrackets((prev) =>
+      prev.map((br) => (br.id === bracketId ? { ...br, flipped: !br.flipped } : br))
+    );
   }, []);
 
   const deleteBracket = useCallback((bracketId) => {
     setBrackets((prev) => prev.filter((br) => br.id !== bracketId));
   }, []);
 
-  const derivedBrackets = useMemo(() => bracketLayout.withCols.map((bracket) => {
-    const topRect = rowRects[bracket.from];
-    const bottomRect = rowRects[bracket.to];
-    const rel = REL_BY_CODE[bracket.code];
-    const yTopBase = Math.min(topRect?.top ?? 0, bottomRect?.top ?? 0);
-    const yBottomBase = Math.max((topRect?.top ?? 0) + (topRect?.height ?? 0), (bottomRect?.top ?? 0) + (bottomRect?.height ?? 0));
-    return {
-      ...bracket,
-      relation: rel,
-      yTop: yTopBase + 2,
-      yBottom: yBottomBase - 2,
-      stemX: LEFT_MARGIN + (bracketLayout.nCols - 1 - bracket.col) * COL_W + COL_W / 2,
-    };
-  }), [bracketLayout, rowRects]);
+  const handleAnchorClick = useCallback((propId) => {
+    setPendingAnchor((current) => {
+      if (!current) return propId;
+      if (current === propId) return null;
+      setSelected([current, propId]);
+      return null;
+    });
+  }, []);
+
+  const rowAnchors = useMemo(
+    () =>
+      props.map((prop) => {
+        const rect = rowRects[prop.id];
+        return {
+          propId: prop.id,
+          y: (rect?.top ?? 0) + (rect?.height ?? 0) / 2,
+        };
+      }),
+    [props, rowRects]
+  );
+
+  const derivedBrackets = useMemo(
+    () =>
+      bracketLayout.withCols.map((bracket) => {
+        const fromRect = rowRects[bracket.from];
+        const toRect = rowRects[bracket.to];
+        const rel = REL_BY_CODE[bracket.code];
+
+        const fromMid = (fromRect?.top ?? 0) + (fromRect?.height ?? 0) / 2;
+        const toMid = (toRect?.top ?? 0) + (toRect?.height ?? 0) / 2;
+
+        const yTop = Math.min(fromMid, toMid);
+        const yBottom = Math.max(fromMid, toMid);
+
+        return {
+          ...bracket,
+          relation: rel,
+          yTop,
+          yBottom,
+          stemX: LEFT_MARGIN + (bracketLayout.nCols - 1 - bracket.col) * COL_W + COL_W / 2,
+        };
+      }),
+    [bracketLayout, rowRects]
+  );
 
   const workspaceReady = props.length > 0;
 
@@ -266,12 +362,15 @@ export function useArcing() {
     rowRects,
     bracketLayout,
     derivedBrackets,
+    rowAnchors,
+    pendingAnchor,
     workspaceReady,
     setEsvKey,
     loadPassage,
     setRowMeasurement,
     toggleSelection,
     splitProposition,
+    mergeWithPrevious,
     autoSplit,
     resetSplits,
     undoSplit,
@@ -279,6 +378,7 @@ export function useArcing() {
     updateBracket,
     flipBracket,
     deleteBracket,
+    handleAnchorClick,
     setCurrentRef,
   };
 }

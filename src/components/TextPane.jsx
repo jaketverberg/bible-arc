@@ -1,7 +1,14 @@
 import { useRef } from 'react';
 import PropositionRow from './PropositionRow';
 
-export default function TextPane({ props, selected, onSelect, onMeasure, onSplit }) {
+export default function TextPane({
+  props,
+  selected,
+  onSelect,
+  onMeasure,
+  onSplit,
+  onMerge,
+}) {
   const containerRef = useRef(null);
   let lastVerse = null;
 
@@ -19,6 +26,7 @@ export default function TextPane({ props, selected, onSelect, onMeasure, onSplit
             onSelect={onSelect}
             onMeasure={onMeasure}
             onSplit={onSplit}
+            onMerge={onMerge}
             showVerseNumber={showVerseNumber}
             containerRef={containerRef}
           />
