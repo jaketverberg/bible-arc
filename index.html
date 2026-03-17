@@ -105,13 +105,14 @@ input[type=color].bgsw{padding:0}
 .bgho{background:transparent;border:1px solid #403c38;color:#a09888}.bgho:hover{border-color:var(--gold);color:var(--gold)}
 
 /* ── Canvas ── */
-.cwrap{flex:1;overflow:auto;background:#242018;padding:1.25rem;display:flex;align-items:flex-start}
+.cwrap{flex:1;overflow:auto;background:#242018;padding:1rem;display:flex;align-items:flex-start}
 
 /* ── Workspace (paper) ── */
 #ws{
   background:var(--paper);border-radius:2px;
   box-shadow:0 4px 36px rgba(0,0,0,.6);
-  position:relative;min-width:280px;width:100%;max-width:880px;
+  position:relative;min-width:280px;width:100%;
+  /* No max-width — fills full canvas area */
 }
 .wstop{
   padding:.75rem 1.5rem .6rem;border-bottom:1px solid var(--rule);
@@ -137,17 +138,17 @@ input[type=color].bgsw{padding:0}
 .pr:hover .pti{background:rgba(184,150,62,.06)}
 .pr.sel .pti{background:rgba(184,150,62,.13)}
 
-/* Verse number — right-aligned, 28px wide */
+/* Verse number — right-aligned, 26px wide */
 .vn{
   font-family:var(--ui);font-size:.65rem;color:var(--ink3);
-  width:28px;flex-shrink:0;text-align:right;
+  width:26px;flex-shrink:0;text-align:right;
   padding-right:4px;padding-top:2px;
   user-select:none;font-style:italic;line-height:1.7;
 }
 /* Sub-label (a,b,c) — tiny, right after vn */
 .vsub{
   font-family:var(--ui);font-size:.58rem;color:#bbb;
-  width:12px;flex-shrink:0;
+  width:10px;flex-shrink:0;
   padding-top:3px;user-select:none;font-style:italic;line-height:1.7;
 }
 
@@ -668,30 +669,33 @@ function buildWordSpans(container,prop){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// BRACKET RENDERING — connected tree
+// BRACKET RENDERING — connected tree, biblearc style
 // ═══════════════════════════════════════════════════════════════
 //
-// Layout (matches biblearc closely):
+// Column model (matching biblearc):
 //
-//   [col N] ... [col 1][col 0] | [vnum][sub] | text text text
+//   col N ... col 1  col 0 | vnum sub | text text text
+//   (outer)          (inner)
 //
-// Key rules:
-//  1. col 0 = innermost (rightmost), col N = outermost (leftmost)
-//  2. Each bracket's TICK (horizontal line at top/bottom) points RIGHT
-//     and its RIGHT endpoint lands exactly on the STEM of the next
-//     inner bracket that overlaps at that y-position.
-//     If no inner bracket overlaps, it terminates with a short tick.
-//  3. Label sits LEFT of each stem, very compact (~16px wide slot)
-//  4. Stems are black/dark; labels are colored
-//  5. Small × circle at each tick endpoint for delete
-//  6. Bracket anchors at TOP of first row, BOTTOM of last row
+//  col 0 = INNERMOST bracket (smallest span, closest to text/verse nums)
+//  col N = OUTERMOST bracket (largest span, farthest left)
 //
-const CW=18;   // column width (pixels) — very tight like biblearc
-const TICK_MAX=6; // max tick length (extends right to parent stem)
-const COL_GAP=4;  // gap between rightmost bracket col and vnum
-const VN_W=28;    // verse number column
-const VS_W=12;    // sub-label column
-const INNER_PAD=4;// tiny pad between sub-label and text
+//  stemX(col) = rightEdgeOfBracketZone - (col+1)*CW
+//             = bZW - (col+1)*CW
+//
+//  Each bracket's TOP tick extends RIGHT from its stem to the stem of
+//  the next INNER bracket (col-1) if one overlaps at that y.
+//  If no inner bracket, the tick terminates just right of its own stem.
+//
+//  Labels: placed ON the top and bottom rung (tick), centered on the tick,
+//  colored by relationship category.
+//
+const CW=20;      // column width per bracket level
+const SHORT_TICK=8; // tick length when no inner bracket to connect to
+const COL_GAP=2;  // gap between rightmost bracket and vnum column
+const VN_W=26;    // verse number column width
+const VS_W=10;    // sub-label column width
+const INNER_PAD=3;// pad between sub-label col and text
 
 let _bdata=[];
 
@@ -705,17 +709,23 @@ function computeCols(){
     const y2=to.offsetTop+to.offsetHeight;
     return{b,y1,y2,col:0};
   }).filter(Boolean);
-  // Sort: largest spans → outermost (largest col)
-  _bdata.sort((a,b)=>(b.y2-b.y1)-(a.y2-a.y1));
+
+  // SMALLEST spans → col 0 (innermost, closest to text)
+  // LARGEST spans  → col N (outermost, farthest left)
+  // Sort smallest first so they get col 0
+  _bdata.sort((a,b)=>(a.y2-a.y1)-(b.y2-b.y1));
+
   _bdata.forEach((cur,i)=>{
     const used=new Set();
     for(let j=0;j<i;j++){
       const o=_bdata[j];
-      if(cur.y1<o.y2-1&&cur.y2>o.y1+1)used.add(o.col);
+      // Overlapping = ranges intersect (not just touching)
+      if(cur.y1<o.y2-2&&cur.y2>o.y1+2) used.add(o.col);
     }
     let c=0;while(used.has(c))c++;
     cur.col=c;
   });
+
   return _bdata.reduce((m,d)=>Math.max(m,d?d.col+1:0),0);
 }
 
@@ -731,94 +741,117 @@ function renderBrackets(){
   }
 
   const nCols=computeCols();
-  // Total bracket zone width
-  const bZW=nCols>0?nCols*CW+COL_GAP:COL_GAP;
+  // Bracket zone width: each column is CW wide, plus a small gap before vnum
+  const bZW=nCols>0?nCols*CW+COL_GAP:0;
   const leftPad=bZW+VN_W+VS_W+INNER_PAD;
 
   area.style.paddingLeft=leftPad+'px';
-  void area.offsetHeight; // force reflow
+  void area.offsetHeight; // force layout reflow
 
   const svgH=area.offsetHeight;
-  const svgW=leftPad;
-  svg.style.width=svgW+'px';
+  svg.style.width=leftPad+'px';
   svg.style.height=svgH+'px';
-  svg.setAttribute('viewBox',`0 0 ${svgW} ${svgH}`);
+  svg.setAttribute('viewBox',`0 0 ${leftPad} ${svgH}`);
 
-  // Build stem x lookup: col → stemX within SVG
-  // col 0 (innermost): stemX = bZW - COL_GAP - 1
-  // col 1: stemX = bZW - COL_GAP - 1 - CW
-  // col N: stemX = bZW - COL_GAP - 1 - N*CW
-  const stemX=col=>bZW-COL_GAP-1-col*CW;
+  // stemX: the x coordinate of a bracket's vertical stem
+  // col 0 is closest to text (rightmost), col N is outermost (leftmost)
+  // The rightmost column's right edge = bZW (just before the gap+vnum)
+  // stem sits at the LEFT side of its column slot:
+  //   stemX(col) = bZW - (col+1)*CW  +  half the slot for centering
+  // Actually: stem is a vertical LINE. We place it at left-center of slot.
+  // Slot for col c: x from (bZW - (c+1)*CW) to (bZW - c*CW)
+  // Stem at left side of slot so labels fit to its right: stemX = bZW-(c+1)*CW + 2
+  const stemX=c=>bZW-(c+1)*CW+2;
 
-  // For each bracket, find which column its ticks should extend TO
-  // (i.e., the nearest inner bracket that covers the same tick y)
-  function tickEndX(col,y){
-    // Find inner brackets (smaller col) that cover y
-    let innerCol=-1;
+  // tickRightX: where the RIGHT end of a tick should land
+  // If there's an inner bracket (col c-1) whose range covers y, extend to its stem
+  // Otherwise, terminate with SHORT_TICK
+  function tickRightX(col,y){
+    if(col===0){
+      // innermost — tick just extends right by SHORT_TICK
+      return stemX(0)+SHORT_TICK;
+    }
+    // Look for next inner bracket (col-1) covering y
+    const innerCol=col-1;
     for(const d of _bdata){
-      if(d.col<col&&d.y1<=y+2&&d.y2>=y-2){
-        if(d.col>innerCol)innerCol=d.col;
+      if(d.col===innerCol&&d.y1-2<=y&&d.y2+2>=y){
+        return stemX(innerCol);
       }
     }
-    if(innerCol>=0) return stemX(innerCol);
-    // No inner bracket — short tick toward text
-    return stemX(col)+TICK_MAX;
+    // No direct neighbor — still extend SHORT_TICK right
+    return stemX(col)+SHORT_TICK;
   }
+
+  const stemColor='#4a4840';
+  const sw=1.5;
 
   _bdata.forEach(d=>{
     if(!d)return;
-    const{b,col,y1,y2}=d;
+    const{b,col}=d;
     const fr=area.querySelector(`.pr[data-pid="${b.from}"]`);
     const to=area.querySelector(`.pr[data-pid="${b.to}"]`);
     if(!fr||!to)return;
 
-    // Re-read y positions after padding update
-    const ry1=fr.offsetTop+1;
-    const ry2=to.offsetTop+to.offsetHeight-1;
-    const mid=(ry1+ry2)/2;
     const sx=stemX(col);
+    // Anchor: top of first row, bottom of last row
+    // Inset by 2px so adjacent brackets don't share exact y
+    const ry1=fr.offsetTop+2;
+    const ry2=to.offsetTop+to.offsetHeight-2;
+    const mid=(ry1+ry2)/2;
 
-    // Tick endpoints
-    const txTop=tickEndX(col,ry1);
-    const txBot=tickEndX(col,ry2);
+    const txR1=tickRightX(col,ry1);
+    const txR2=tickRightX(col,ry2);
+    const tickMidX1=(sx+txR1)/2;
+    const tickMidX2=(sx+txR2)/2;
 
-    const stemCol='#3a3830';
-    const sw=1.4;
+    // ── Vertical stem ──
+    svgLine(svg,sx,ry1,sx,ry2,stemColor,sw);
+    // ── Top rung (tick) ──
+    svgLine(svg,sx,ry1,txR1,ry1,stemColor,sw);
+    // ── Bottom rung (tick) ──
+    svgLine(svg,sx,ry2,txR2,ry2,stemColor,sw);
 
-    // Vertical stem
-    svgLine(svg,sx,ry1,sx,ry2,stemCol,sw);
-    // Top tick
-    svgLine(svg,sx,ry1,txTop,ry1,stemCol,sw);
-    // Bottom tick
-    svgLine(svg,sx,ry2,txBot,ry2,stemCol,sw);
-
-    // Label: colored, inside the col slot, left of stem
-    // Available width = CW - 2px (leave 1px each side of stem)
-    const lblW=CW-2;
-    const lblH=13;
-    const lblX=sx-lblW-1; // label sits immediately left of stem
-    const lblY=mid-lblH/2;
-
-    const lbl=getBracketLabel(b);
+    // ── Labels ON the rungs ──
+    // Top label: on the top tick, colored
     const lc=b.color;
+    const fsize=8.5;
 
-    // Colored background pill
-    svgRect(svg,lblX,lblY,lblW,lblH,lc+'1c',lc+'55',2);
+    // We show the relationship code on the TOP rung
+    // For long codes (Ac/Res etc) we split across top+bottom
+    const parts=getLabelParts(b);
 
-    // Label text
-    const t=svgText(svg,lblX+lblW/2,mid,lbl,lc,8.5);
-    t.setAttribute('font-weight','700');
-    t.setAttribute('font-style','italic');
-    t.setAttribute('font-family','Georgia,serif');
+    if(parts.length===1){
+      // Single label — center on top rung
+      drawRungLabel(svg,tickMidX1,ry1,parts[0],lc,fsize);
+    } else {
+      // Dual label — top rung gets first part, bottom gets second
+      drawRungLabel(svg,tickMidX1,ry1,parts[0],lc,fsize);
+      drawRungLabel(svg,tickMidX2,ry2,parts[1],lc,fsize);
+    }
   });
 }
 
-function getBracketLabel(b){
-  if(!FLIPPABLE.has(b.code)) return b.code;
-  const pair=FLIP_LABELS[b.code];
-  if(!pair) return b.code;
-  // When flipped, show the "second" label; else the code itself
-  return b.code; // The bracket list shows the split labels; here we show the code
+function getLabelParts(b){
+  const code=b.code;
+  // Relationships with meaningful two-part labels
+  const duals={
+    'Ac/Res':['Ac','Res'],'Ac/Pur':['Ac','Pur'],
+    'If/Th':['If','Th'],'Ac/Mn':['Ac','Mn'],
+    '-/+':['−','+'],'Id/Exp':['Id','Exp'],
+    'Q/A':['Q','A'],'Sit/R':['Sit','R'],
+  };
+  if(duals[code]) return duals[code];
+  return [code];
+}
+
+function drawRungLabel(svg,x,y,text,color,fsize){
+  const w=Math.max(12,text.length*5.2+6);
+  const h=11;
+  svgRect(svg,x-w/2,y-h/2,w,h,color+'1a',color+'44',2);
+  const t=svgText(svg,x,y,text,color,fsize);
+  t.setAttribute('font-weight','700');
+  t.setAttribute('font-style','italic');
+  t.setAttribute('font-family','Georgia,serif');
 }
 
 // ── SVG helpers ──────────────────────────────────────────────
