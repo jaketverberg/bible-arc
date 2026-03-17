@@ -4,7 +4,6 @@ import PropositionRow from './PropositionRow';
 export default function TextPane({
   props,
   selected,
-  onSelect,
   onMeasure,
   onSplit,
   onMerge,
@@ -23,7 +22,6 @@ export default function TextPane({
             key={prop.id}
             prop={prop}
             selected={selected.includes(prop.id)}
-            onSelect={onSelect}
             onMeasure={onMeasure}
             onSplit={onSplit}
             onMerge={onMerge}

@@ -5,7 +5,8 @@ import { CATEGORY_COLORS, REL_BY_CODE } from '../constants/relationships';
 const COL_W = 28;
 const LEFT_MARGIN = 4;
 
-const majorSplitPattern = /(;|,?\s+(?:and|but|for|because|therefore|so that|in order that|when|before|after|if|unless|although|though|yet|moreover|likewise|then)\s+)/i;
+const majorSplitPattern =
+  /(;|,?\s+(?:and|but|for|because|therefore|so that|in order that|when|before|after|if|unless|although|though|yet|moreover|likewise|then)\s+)/i;
 
 function alphaLabel(index) {
   return 'abcdefghijklmnopqrstuvwxyz'[index] || '';
@@ -40,6 +41,7 @@ function assignBracketColumns(brackets, propOrderMap) {
   });
 
   normalized.sort((a, b) => b.span - a.span || a.topIndex - b.topIndex || a.id - b.id);
+
   const columns = [];
 
   const withCols = normalized.map((bracket) => {
@@ -57,7 +59,11 @@ function assignBracketColumns(brackets, propOrderMap) {
   });
 
   const nCols = Math.max(1, columns.length);
-  return { withCols, nCols, paneWidth: LEFT_MARGIN + nCols * COL_W + 24 };
+  return {
+    withCols,
+    nCols,
+    paneWidth: LEFT_MARGIN + nCols * COL_W + 24,
+  };
 }
 
 function parseInitialProps(rawVerses) {
@@ -92,34 +98,37 @@ export function useArcing() {
   const propOrderMap = useMemo(() => new Map(props.map((prop, idx) => [prop.id, idx])), [props]);
   const bracketLayout = useMemo(() => assignBracketColumns(brackets, propOrderMap), [brackets, propOrderMap]);
 
-  const loadPassage = useCallback(async (reference) => {
-    if (!esvKey) {
-      setError('Please add an ESV API key first.');
-      return;
-    }
+  const loadPassage = useCallback(
+    async (reference) => {
+      if (!esvKey) {
+        setError('Please add an ESV API key first.');
+        return;
+      }
 
-    setLoading(true);
-    setError('');
+      setLoading(true);
+      setError('');
 
-    try {
-      const verses = await fetchPassage(reference, esvKey);
-      const initialProps = parseInitialProps(verses);
-      setRawVerses(verses);
-      setProps(initialProps);
-      setBrackets([]);
-      setSelected([]);
-      setSplitHistory([]);
-      setRowRects({});
-      setPendingAnchor(null);
-      setCurrentRef(reference);
-      nextPropId.current = 1000;
-      nextBracketId.current = 1;
-    } catch (err) {
-      setError(err.message || 'Failed to load passage.');
-    } finally {
-      setLoading(false);
-    }
-  }, [esvKey]);
+      try {
+        const verses = await fetchPassage(reference, esvKey);
+        const initialProps = parseInitialProps(verses);
+        setRawVerses(verses);
+        setProps(initialProps);
+        setBrackets([]);
+        setSelected([]);
+        setSplitHistory([]);
+        setRowRects({});
+        setPendingAnchor(null);
+        setCurrentRef(reference);
+        nextPropId.current = 1000;
+        nextBracketId.current = 1;
+      } catch (err) {
+        setError(err.message || 'Failed to load passage.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [esvKey]
+  );
 
   const setRowMeasurement = useCallback((propId, measurement) => {
     setRowRects((prev) => ({ ...prev, [propId]: measurement }));
@@ -249,33 +258,36 @@ export function useArcing() {
     });
   }, []);
 
-  const addBracket = useCallback((code) => {
-    if (selected.length !== 2) return;
+  const addBracket = useCallback(
+    (code) => {
+      if (selected.length !== 2) return;
 
-    const rel = REL_BY_CODE[code];
-    if (!rel) return;
+      const rel = REL_BY_CODE[code];
+      if (!rel) return;
 
-    const normalized = normalizeBracket(selected[0], selected[1]);
-    const alreadyExists = brackets.some(
-      (br) => br.from === normalized.from && br.to === normalized.to && br.code === code
-    );
-    if (alreadyExists) return;
+      const normalized = normalizeBracket(selected[0], selected[1]);
+      const alreadyExists = brackets.some(
+        (br) => br.from === normalized.from && br.to === normalized.to && br.code === code
+      );
+      if (alreadyExists) return;
 
-    setBrackets((prev) => [
-      ...prev,
-      {
-        id: nextBracketId.current++,
-        from: normalized.from,
-        to: normalized.to,
-        code,
-        color: CATEGORY_COLORS[rel.category],
-        flipped: false,
-      },
-    ]);
+      setBrackets((prev) => [
+        ...prev,
+        {
+          id: nextBracketId.current++,
+          from: normalized.from,
+          to: normalized.to,
+          code,
+          color: CATEGORY_COLORS[rel.category],
+          flipped: false,
+        },
+      ]);
 
-    setSelected([]);
-    setPendingAnchor(null);
-  }, [selected, brackets]);
+      setSelected([]);
+      setPendingAnchor(null);
+    },
+    [selected, brackets]
+  );
 
   const updateBracket = useCallback((bracketId, updates) => {
     setBrackets((prev) =>
@@ -341,7 +353,7 @@ export function useArcing() {
           relation: rel,
           yTop,
           yBottom,
-          stemX: LEFT_MARGIN + (bracketLayout.nCols - 1 - bracket.col) * COL_W + COL_W / 2,
+          stemX: LEFT_MARGIN + bracket.col * COL_W + COL_W / 2,
         };
       }),
     [bracketLayout, rowRects]

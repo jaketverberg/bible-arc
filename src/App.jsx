@@ -27,10 +27,6 @@ function WorkspacePage() {
   return (
     <div className="min-h-screen bg-paper pb-20 text-stone-900 lg:flex lg:pb-0">
       <Sidebar
-        currentRef={arcing.currentRef}
-        setCurrentRef={arcing.setCurrentRef}
-        onLoad={arcing.loadPassage}
-        loading={arcing.loading}
         selected={arcing.selected}
         onApplyRelation={arcing.addBracket}
         brackets={arcing.brackets}
@@ -40,7 +36,6 @@ function WorkspacePage() {
         onUndoSplit={arcing.undoSplit}
         onAutoSplit={arcing.autoSplit}
         onResetSplits={arcing.resetSplits}
-        onShowKey={() => setShowKeyModal(true)}
         workspaceRef={workspaceRef}
         exportBg={exportBg}
         setExportBg={setExportBg}
@@ -53,7 +48,13 @@ function WorkspacePage() {
       />
 
       <main className="min-w-0 flex-1">
-        <WorkspaceHeader currentRef={arcing.currentRef} />
+        <WorkspaceHeader
+          currentRef={arcing.currentRef}
+          setCurrentRef={arcing.setCurrentRef}
+          onLoad={arcing.loadPassage}
+          loading={arcing.loading}
+          onShowKey={() => setShowKeyModal(true)}
+        />
 
         {arcing.error && (
           <div className="mx-4 mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -71,7 +72,6 @@ function WorkspacePage() {
               onDelete={arcing.deleteBracket}
               onFlip={arcing.flipBracket}
               rowAnchors={arcing.rowAnchors}
-              nCols={arcing.bracketLayout.nCols}
               pendingAnchor={arcing.pendingAnchor}
               onAnchorClick={arcing.handleAnchorClick}
             />
@@ -79,7 +79,6 @@ function WorkspacePage() {
             <TextPane
               props={arcing.props}
               selected={arcing.selected}
-              onSelect={arcing.toggleSelection}
               onMeasure={arcing.setRowMeasurement}
               onSplit={arcing.splitProposition}
               onMerge={arcing.mergeWithPrevious}

@@ -3,7 +3,6 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 export default function PropositionRow({
   prop,
   selected,
-  onSelect,
   onMeasure,
   onSplit,
   onMerge,
@@ -40,9 +39,8 @@ export default function PropositionRow({
   return (
     <div
       ref={ref}
-      onClick={() => onSelect(prop.id)}
-      className={`group mb-1.5 flex cursor-pointer items-stretch gap-3 rounded-[3px] border border-[#d0c8b4] px-3 py-2 transition ${
-        selected ? 'bg-[rgba(184,150,62,0.13)]' : 'hover:bg-[rgba(184,150,62,0.06)]'
+      className={`group mb-1.5 flex items-stretch gap-3 rounded-[3px] border border-[#d0c8b4] px-3 py-2 transition ${
+        selected ? 'bg-[rgba(184,150,62,0.13)]' : 'hover:bg-[rgba(184,150,62,0.04)]'
       }`}
     >
       <div className="w-16 shrink-0 pt-1 text-right text-sm text-stone-500">
@@ -52,33 +50,27 @@ export default function PropositionRow({
 
       <div className="min-w-0 flex-1 font-body text-[1rem] leading-[1.7] text-stone-800">
         {tokens.map((word, idx) => (
-          <span key={`${prop.id}-${idx}`} className="relative inline-block">
+          <span key={`${prop.id}-${idx}`} className="inline">
             <span>{word}</span>
 
             {idx < tokens.length - 1 && (
-              <span
-                className="relative inline-block w-3"
-                onMouseEnter={(e) => {
-                  e.stopPropagation();
-                  setHoverIndex(idx + 1);
-                }}
-                onMouseLeave={(e) => {
-                  e.stopPropagation();
-                  setHoverIndex(null);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
+              <button
+                type="button"
+                aria-label="Split here"
+                className="relative inline-flex h-[1.35em] w-4 translate-y-[0.08em] items-center justify-center align-baseline"
+                onMouseEnter={() => setHoverIndex(idx + 1)}
+                onMouseLeave={() => setHoverIndex(null)}
+                onClick={() => {
                   onSplit(prop.id, idx + 1);
                   setHoverIndex(null);
                 }}
               >
-                {' '}
                 <span
-                  className={`absolute left-1/2 top-[-2px] h-[1.6em] w-[2px] -translate-x-1/2 rounded bg-red-600 transition ${
+                  className={`h-[1.15em] w-[2px] rounded bg-red-600 transition ${
                     hoverIndex === idx + 1 ? 'opacity-100' : 'opacity-0'
                   }`}
                 />
-              </span>
+              </button>
             )}
           </span>
         ))}
@@ -87,10 +79,7 @@ export default function PropositionRow({
       {prop.subLabel && (
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onMerge(prop.id);
-          }}
+          onClick={() => onMerge(prop.id)}
           className="self-start rounded px-1 text-stone-400 transition hover:text-red-700"
           title="Remove split and merge upward"
         >

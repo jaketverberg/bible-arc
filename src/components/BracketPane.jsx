@@ -1,9 +1,6 @@
 import { useMemo, useState } from 'react';
 import { REL_BY_CODE, REL_GROUPS } from '../constants/relationships';
 
-const COL_W = 28;
-const LEFT_MARGIN = 4;
-
 export default function BracketPane({
   brackets,
   paneWidth,
@@ -12,7 +9,6 @@ export default function BracketPane({
   onDelete,
   onFlip,
   rowAnchors = [],
-  nCols = 1,
   pendingAnchor = null,
   onAnchorClick,
 }) {
@@ -22,20 +18,23 @@ export default function BracketPane({
   const findOverlapX = (target, isTop) => {
     const currentY = isTop ? target.yTop : target.yBottom;
     const inner = brackets
-      .filter((candidate) => candidate.col > target.col && currentY >= candidate.yTop && currentY <= candidate.yBottom)
+      .filter(
+        (candidate) =>
+          candidate.col > target.col &&
+          currentY >= candidate.yTop &&
+          currentY <= candidate.yBottom
+      )
       .sort((a, b) => a.col - b.col)[0];
 
-    return inner ? inner.stemX : target.stemX + 10;
+    return inner ? inner.stemX : target.stemX + 12;
   };
 
   const popoverStyle = active
     ? {
-        left: Math.max(8, Math.min((active.stemX || 24) + 12, paneWidth - 260)),
+        left: Math.max(8, Math.min((active.stemX || 24) + 16, paneWidth - 260)),
         top: Math.max(8, (active.yTop || 0) - 4),
       }
     : null;
-
-  const anchorColumns = Math.max(1, nCols + 1);
 
   return (
     <div
@@ -43,24 +42,22 @@ export default function BracketPane({
       style={{ width: paneWidth, minWidth: paneWidth }}
     >
       <svg width={paneWidth} height={Math.max(paneHeight, 200)} className="overflow-visible">
-        {rowAnchors.flatMap((anchor) =>
-          Array.from({ length: anchorColumns }).map((_, i) => {
-            const cx = LEFT_MARGIN + i * COL_W + 10;
-            const isPending = pendingAnchor === anchor.propId && i === anchorColumns - 1;
-            return (
-              <circle
-                key={`anchor-${anchor.propId}-${i}`}
-                cx={cx}
-                cy={anchor.y}
-                r={isPending ? 6 : 5}
-                fill={isPending ? '#b8963e' : '#ddd8ca'}
-                opacity={isPending ? 0.95 : 0.55}
-                className="cursor-pointer transition hover:opacity-100"
-                onClick={() => onAnchorClick?.(anchor.propId)}
-              />
-            );
-          })
-        )}
+        {rowAnchors.map((anchor) => {
+          const isPending = pendingAnchor === anchor.propId;
+          const cx = paneWidth - 10;
+          return (
+            <circle
+              key={`anchor-${anchor.propId}`}
+              cx={cx}
+              cy={anchor.y}
+              r={isPending ? 6 : 5}
+              fill={isPending ? '#b8963e' : '#ddd8ca'}
+              opacity={isPending ? 0.95 : 0.6}
+              className="cursor-pointer transition hover:opacity-100"
+              onClick={() => onAnchorClick?.(anchor.propId)}
+            />
+          );
+        })}
 
         {brackets.map((bracket) => {
           const topX2 = findOverlapX(bracket, true);
