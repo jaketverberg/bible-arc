@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Bible Arcing</title>
+    <script>
+      const path = window.location.pathname;
+      const repo = '/repo-name';
+      const next = path.startsWith(repo) ? path.slice(repo.length) : path;
+      window.location.replace(repo + '/#' + next + window.location.search + window.location.hash);
+    </script>
+  </head>
+  <body></body>
+</html>
