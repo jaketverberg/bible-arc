@@ -21,7 +21,7 @@ export default function TextPane({
           <PropositionRow
             key={prop.id}
             prop={prop}
-            selected={selected.includes(prop.id)}
+            selected={selected.includes(`p:${prop.id}`)}
             onMeasure={onMeasure}
             onSplit={onSplit}
             onMerge={onMerge}

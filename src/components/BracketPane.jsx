@@ -9,6 +9,7 @@ export default function BracketPane({
   onDelete,
   onFlip,
   rowAnchors = [],
+  bracketAnchors = [],
   pendingAnchor = null,
   onAnchorClick,
 }) {
@@ -26,13 +27,13 @@ export default function BracketPane({
       )
       .sort((a, b) => a.col - b.col)[0];
 
-    return inner ? inner.stemX : target.stemX + 12;
+    return inner ? inner.stemX : paneWidth - 10;
   };
 
   const popoverStyle = active
     ? {
-        left: Math.max(8, Math.min((active.stemX || 24) + 16, paneWidth - 260)),
-        top: Math.max(8, (active.yTop || 0) - 4),
+        left: Math.max(8, Math.min((active.stemX || 24) + 18, paneWidth - 260)),
+        top: Math.max(8, (active.anchorY || 0) - 36),
       }
     : null;
 
@@ -43,18 +44,17 @@ export default function BracketPane({
     >
       <svg width={paneWidth} height={Math.max(paneHeight, 200)} className="overflow-visible">
         {rowAnchors.map((anchor) => {
-          const isPending = pendingAnchor === anchor.propId;
-          const cx = paneWidth - 10;
+          const isPending = pendingAnchor === anchor.id;
           return (
             <circle
-              key={`anchor-${anchor.propId}`}
-              cx={cx}
+              key={anchor.id}
+              cx={paneWidth - 10}
               cy={anchor.y}
               r={isPending ? 6 : 5}
               fill={isPending ? '#b8963e' : '#ddd8ca'}
               opacity={isPending ? 0.95 : 0.6}
               className="cursor-pointer transition hover:opacity-100"
-              onClick={() => onAnchorClick?.(anchor.propId)}
+              onClick={() => onAnchorClick?.(anchor.id)}
             />
           );
         })}
@@ -68,10 +68,7 @@ export default function BracketPane({
           const bottomLabelX = (bracket.stemX + bottomX2) / 2;
 
           return (
-            <g
-              key={bracket.id}
-              onMouseLeave={() => setActiveId((id) => (id === bracket.id ? null : id))}
-            >
+            <g key={bracket.id}>
               <line
                 x1={bracket.stemX}
                 y1={bracket.yTop}
@@ -79,6 +76,8 @@ export default function BracketPane({
                 y2={bracket.yBottom}
                 stroke={bracket.color}
                 strokeWidth="2"
+                className="cursor-pointer"
+                onClick={() => setActiveId(bracket.id)}
               />
               <line
                 x1={bracket.stemX}
@@ -108,6 +107,8 @@ export default function BracketPane({
                 fontSize="11"
                 fontWeight="600"
                 fill={bracket.color}
+                className="cursor-pointer"
+                onClick={() => setActiveId(bracket.id)}
               >
                 {labels[0]}
               </text>
@@ -120,35 +121,56 @@ export default function BracketPane({
                   fontSize="11"
                   fontWeight="600"
                   fill={bracket.color}
+                  className="cursor-pointer"
+                  onClick={() => setActiveId(bracket.id)}
                 >
                   {labels[1]}
                 </text>
               )}
-
-              {activeId === bracket.id && (
-                <g transform={`translate(${bracket.stemX - 8}, ${bracket.yTop - 10})`}>
-                  <circle
-                    cx="0"
-                    cy="0"
-                    r="8"
-                    fill="#ffffff"
-                    stroke="#7c2d12"
-                    className="cursor-pointer"
-                    onClick={() => onDelete(bracket.id)}
-                  />
-                  <text x="0" y="4" textAnchor="middle" fontSize="12" fill="#7c2d12">
-                    ×
-                  </text>
-                </g>
-              )}
             </g>
           );
         })}
+
+        {bracketAnchors.map((anchor) => {
+          const isPending = pendingAnchor === anchor.id;
+          return (
+            <circle
+              key={anchor.id}
+              cx={anchor.x}
+              cy={anchor.y}
+              r={isPending ? 6 : 5}
+              fill={isPending ? '#b8963e' : '#ddd8ca'}
+              opacity={isPending ? 0.95 : 0.45}
+              className="cursor-pointer transition hover:opacity-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAnchorClick?.(anchor.id);
+              }}
+            />
+          );
+        })}
+
+        {active && (
+          <g transform={`translate(${active.stemX - 8}, ${active.yTop - 10})`}>
+            <circle
+              cx="0"
+              cy="0"
+              r="8"
+              fill="#ffffff"
+              stroke="#7c2d12"
+              className="cursor-pointer"
+              onClick={() => onDelete(active.id)}
+            />
+            <text x="0" y="4" textAnchor="middle" fontSize="12" fill="#7c2d12">
+              ×
+            </text>
+          </g>
+        )}
       </svg>
 
       {active && popoverStyle && (
         <div
-          className="absolute z-10 w-64 rounded-lg border border-stone-300 bg-white p-3 shadow-xl"
+          className="absolute z-20 w-64 rounded-lg border border-stone-300 bg-white p-3 shadow-xl"
           style={popoverStyle}
         >
           <div className="mb-2 flex items-center justify-between">
@@ -186,11 +208,17 @@ export default function BracketPane({
 
           <div className="mt-3 flex gap-2">
             {REL_BY_CODE[active.code].flippable && (
-              <button onClick={() => onFlip(active.id)} className="rounded border px-2 py-1 text-xs">
+              <button
+                onClick={() => onFlip(active.id)}
+                className="rounded border px-2 py-1 text-xs"
+              >
                 Flip direction
               </button>
             )}
-            <button onClick={() => onDelete(active.id)} className="rounded border px-2 py-1 text-xs">
+            <button
+              onClick={() => onDelete(active.id)}
+              className="rounded border px-2 py-1 text-xs"
+            >
               Delete
             </button>
           </div>

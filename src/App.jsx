@@ -72,6 +72,7 @@ function WorkspacePage() {
               onDelete={arcing.deleteBracket}
               onFlip={arcing.flipBracket}
               rowAnchors={arcing.rowAnchors}
+              bracketAnchors={arcing.bracketAnchors}
               pendingAnchor={arcing.pendingAnchor}
               onAnchorClick={arcing.handleAnchorClick}
             />
