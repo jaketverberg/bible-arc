@@ -1,18 +1,29 @@
+import { useRef } from 'react';
 import PropositionRow from './PropositionRow';
 
 export default function TextPane({ props, selected, onSelect, onMeasure, onSplit }) {
+  const containerRef = useRef(null);
+  let lastVerse = null;
+
   return (
-    <div className="min-w-[420px] flex-1 px-4 py-4">
-      {props.map((prop) => (
-        <PropositionRow
-          key={prop.id}
-          prop={prop}
-          selected={selected.includes(prop.id)}
-          onSelect={onSelect}
-          onMeasure={onMeasure}
-          onSplit={onSplit}
-        />
-      ))}
+    <div ref={containerRef} className="min-w-[420px] flex-1 px-4 py-4">
+      {props.map((prop) => {
+        const showVerseNumber = prop.verseNum !== lastVerse;
+        lastVerse = prop.verseNum;
+
+        return (
+          <PropositionRow
+            key={prop.id}
+            prop={prop}
+            selected={selected.includes(prop.id)}
+            onSelect={onSelect}
+            onMeasure={onMeasure}
+            onSplit={onSplit}
+            showVerseNumber={showVerseNumber}
+            containerRef={containerRef}
+          />
+        );
+      })}
     </div>
   );
 }

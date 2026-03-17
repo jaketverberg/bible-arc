@@ -5,7 +5,7 @@ export default function PropositionRow({ prop, selected, onSelect, onMeasure, on
   const [hoverIndex, setHoverIndex] = useState(null);
   const tokens = useMemo(() => prop.text.split(/\s+/).filter(Boolean), [prop.text]);
 
-  useLayoutEffect(() => {
+   useLayoutEffect(() => {
     const measure = () => {
       if (!ref.current || !containerRef.current) return;
       const rowRect = ref.current.getBoundingClientRect();

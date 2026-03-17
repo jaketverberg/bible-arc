@@ -15,31 +15,44 @@ const buildParams = (reference) => {
 export async function fetchPassage(reference, esvKey) {
   const params = buildParams(reference);
   const target = `https://api.esv.org/v3/passage/text/?${params}`;
-  const parseResponse = async (response) => {
+
+  const parseJsonResponse = async (response) => {
     if (!response.ok) throw new Error('Unable to load passage from ESV API.');
     const data = await response.json();
     const combined = (data.passages || []).join('\n').replace(/\s+/g, ' ').trim();
-    return parseVerses(combined);
+    const verses = parseVerses(combined);
+    if (!verses.length) throw new Error('No verses were returned for that reference.');
+    return verses;
+  };
+
+  const parseTextResponse = async (response) => {
+    if (!response.ok) throw new Error('Unable to load passage from ESV API.');
+    const text = (await response.text()).replace(/\s+/g, ' ').trim();
+    const verses = parseVerses(text);
+    if (!verses.length) throw new Error('No verses were returned for that reference.');
+    return verses;
   };
 
   try {
     const response = await fetch(target, {
       headers: { Authorization: `Token ${esvKey}` },
     });
-    return await parseResponse(response);
-  } catch (error) {
+    return await parseJsonResponse(response);
+  } catch {
     const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`;
     const fallback = await fetch(proxied, {
       headers: { Authorization: `Token ${esvKey}` },
     });
-    return await parseResponse(fallback);
+    return await parseTextResponse(fallback);
   }
 }
 
 export function parseVerses(text) {
   const matches = [...text.matchAll(/\[(\d+)\]\s*([^\[]*)/g)];
-  return matches.map((match) => ({
-    verse: Number(match[1]),
-    text: match[2].trim(),
-  }));
+  return matches
+    .map((match) => ({
+      verse: Number(match[1]),
+      text: match[2].trim(),
+    }))
+    .filter((v) => v.text);
 }
