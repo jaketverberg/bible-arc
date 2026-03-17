@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #221f17;
+  background: #f8f5ef;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Spectral', Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+
+button, input { font: inherit; }
+
+svg text { user-select: none; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+}
