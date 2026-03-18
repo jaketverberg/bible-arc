@@ -228,16 +228,6 @@ export function useArcing() {
     setRowRects((prev) => ({ ...prev, [propId]: measurement }));
   }, []);
 
-  const toggleSelection = useCallback((propId) => {
-    const nodeId = propNodeId(propId);
-    setPendingAnchor(null);
-    setSelected((prev) => {
-      if (prev.includes(nodeId)) return prev.filter((id) => id !== nodeId);
-      if (prev.length >= 2) return [prev[1], nodeId];
-      return [...prev, nodeId];
-    });
-  }, []);
-
   const handleAnchorClick = useCallback((nodeId) => {
     setPendingAnchor((current) => {
       if (!current) return nodeId;
@@ -555,7 +545,6 @@ export function useArcing() {
     setEsvKey,
     loadPassage,
     setRowMeasurement,
-    toggleSelection,
     splitProposition,
     mergeWithPrevious,
     autoSplit,
