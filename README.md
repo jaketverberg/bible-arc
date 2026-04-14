@@ -1,6 +1,6 @@
 # Bible Arcing React App
 
-A Vite + React app for diagramming Bible propositions with SVG brackets, relationship labels, ESV passage loading, and PNG / print export.
+A Vite + React app for diagramming Bible propositions with SVG brackets, relationship labels, Bolls Life passage loading, translation selection, and PNG / print export.
 
 ## Local setup
 
@@ -26,5 +26,6 @@ You do **not** need to put the repository name in the app code, and you do **not
 
 - Uses `HashRouter` for GitHub Pages compatibility.
 - Uses relative Vite asset paths, so it works under a project site without hard-coding `/repo-name/`.
-- Stores the ESV API key in `localStorage` under `esv-api-key`.
+- Loads scripture text from the Bolls Life API.
+- Stores the selected translation in `localStorage` under `bible-translation`, defaulting to `ESV`.
 - Includes a `public/404.html` helper for edge-case direct loads.

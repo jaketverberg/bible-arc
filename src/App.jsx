@@ -5,12 +5,10 @@ import WorkspaceHeader from './components/WorkspaceHeader';
 import BracketPane from './components/BracketPane';
 import TextPane from './components/TextPane';
 import Legend from './components/Legend';
-import KeyModal from './components/KeyModal';
 import { useArcing } from './hooks/useArcing';
 
 function WorkspacePage() {
   const arcing = useArcing();
-  const [showKeyModal, setShowKeyModal] = useState(!arcing.esvKey);
   const [exportBg, setExportBg] = useState('#f8f5ef');
   const [exportLegend, setExportLegend] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
@@ -52,8 +50,10 @@ function WorkspacePage() {
           currentRef={arcing.currentRef}
           setCurrentRef={arcing.setCurrentRef}
           onLoad={arcing.loadPassage}
+          translation={arcing.translation}
+          translations={arcing.translations}
+          setTranslation={arcing.setTranslation}
           loading={arcing.loading}
-          onShowKey={() => setShowKeyModal(true)}
         />
 
         {arcing.error && (
@@ -100,12 +100,6 @@ function WorkspacePage() {
         </div>
       </main>
 
-      <KeyModal
-        open={showKeyModal}
-        value={arcing.esvKey}
-        onChange={arcing.setEsvKey}
-        onClose={() => setShowKeyModal(false)}
-      />
     </div>
   );
 }

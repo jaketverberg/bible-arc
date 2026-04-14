@@ -2,8 +2,10 @@ export default function WorkspaceHeader({
   currentRef,
   setCurrentRef,
   onLoad,
+  translation,
+  translations,
+  setTranslation,
   loading,
-  onShowKey,
 }) {
   return (
     <div className="border-b border-stone-300 bg-paper px-4 py-4">
@@ -18,7 +20,7 @@ export default function WorkspaceHeader({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-wrap sm:justify-end">
           <input
             value={currentRef}
             onChange={(e) => setCurrentRef(e.target.value)}
@@ -26,6 +28,21 @@ export default function WorkspaceHeader({
             className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none focus:border-gold sm:w-[300px]"
             placeholder="Romans 1:1-5"
           />
+          <select
+            value={translation}
+            onChange={(e) => setTranslation(e.target.value)}
+            className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none focus:border-gold sm:w-[280px]"
+          >
+            {translations.length === 0 ? (
+              <option value={translation}>{translation}</option>
+            ) : (
+              translations.map((item) => (
+                <option key={item.code} value={item.code}>
+                  {item.label}
+                </option>
+              ))
+            )}
+          </select>
           <div className="flex gap-2">
             <button
               onClick={() => onLoad(currentRef)}
@@ -33,12 +50,6 @@ export default function WorkspaceHeader({
               className="rounded-md bg-gold px-3 py-2 text-sm font-semibold text-stone-900 disabled:opacity-60"
             >
               {loading ? 'Loading...' : 'Load'}
-            </button>
-            <button
-              onClick={onShowKey}
-              className="rounded-md border border-stone-500 px-3 py-2 text-sm text-stone-700"
-            >
-              Change Key
             </button>
           </div>
         </div>

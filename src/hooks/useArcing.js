@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { fetchPassage } from './useESV';
+import { fetchPassage, fetchTranslations } from './useBible';
 import { CATEGORY_COLORS, REL_BY_CODE } from '../constants/relationships';
 
 const COL_W = 28;
@@ -169,7 +169,8 @@ export function useArcing() {
   const [splitHistory, setSplitHistory] = useState([]);
   const [rawVerses, setRawVerses] = useState([]);
   const [currentRef, setCurrentRef] = useState('');
-  const [esvKey, setEsvKey] = useState(() => localStorage.getItem('esv-api-key') || '');
+  const [translation, setTranslation] = useState(() => localStorage.getItem('bible-translation') || 'ESV');
+  const [translations, setTranslations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rowRects, setRowRects] = useState({});
@@ -179,8 +180,29 @@ export function useArcing() {
   const nextBracketId = useRef(1);
 
   useEffect(() => {
-    if (esvKey) localStorage.setItem('esv-api-key', esvKey);
-  }, [esvKey]);
+    localStorage.setItem('bible-translation', translation);
+  }, [translation]);
+
+  useEffect(() => {
+    let active = true;
+
+    fetchTranslations()
+      .then((items) => {
+        if (!active) return;
+        setTranslations(items);
+        if (!items.some((item) => item.code === translation)) {
+          setTranslation('ESV');
+        }
+      })
+      .catch(() => {
+        if (!active) return;
+        setError('Unable to load Bible translation choices.');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const propOrderMap = useMemo(
     () => new Map(props.map((prop, idx) => [prop.id, idx])),
@@ -194,16 +216,11 @@ export function useArcing() {
 
   const loadPassage = useCallback(
     async (reference) => {
-      if (!esvKey) {
-        setError('Please add an ESV API key first.');
-        return;
-      }
-
       setLoading(true);
       setError('');
 
       try {
-        const verses = await fetchPassage(reference, esvKey);
+        const verses = await fetchPassage(reference, translation);
         const initialProps = parseInitialProps(verses);
         setRawVerses(verses);
         setProps(initialProps);
@@ -221,7 +238,7 @@ export function useArcing() {
         setLoading(false);
       }
     },
-    [esvKey]
+    [translation]
   );
 
   const setRowMeasurement = useCallback((propId, measurement) => {
@@ -532,7 +549,8 @@ export function useArcing() {
     splitHistory,
     rawVerses,
     currentRef,
-    esvKey,
+    translation,
+    translations,
     loading,
     error,
     rowRects,
@@ -542,7 +560,7 @@ export function useArcing() {
     bracketAnchors,
     pendingAnchor,
     workspaceReady,
-    setEsvKey,
+    setTranslation,
     loadPassage,
     setRowMeasurement,
     splitProposition,
