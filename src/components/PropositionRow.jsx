@@ -8,6 +8,7 @@ export default function PropositionRow({
   onMerge,
   showVerseNumber,
   containerRef,
+  remeasureToken,
 }) {
   const ref = useRef(null);
   const [hoverIndex, setHoverIndex] = useState(null);
@@ -15,26 +16,28 @@ export default function PropositionRow({
 
   useLayoutEffect(() => {
     const measure = () => {
-      if (!ref.current || !containerRef?.current) return;
-      const rowRect = ref.current.getBoundingClientRect();
-      const containerRect = containerRef.current.getBoundingClientRect();
+      const row = ref.current;
+      const container = containerRef?.current;
+      if (!row || !container) return;
+
+      const rowRect = row.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+
       onMeasure(prop.id, {
-        top: rowRect.top - containerRect.top + containerRef.current.scrollTop,
+        top: rowRect.top - containerRect.top + container.scrollTop,
         height: rowRect.height,
       });
     };
 
     measure();
 
-    const observer = new ResizeObserver(measure);
-    if (ref.current) observer.observe(ref.current);
+    // Re-measure on window resize (viewport changes).
     window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
 
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', measure);
-    };
-  }, [containerRef, onMeasure, prop.id, prop.text]);
+    // remeasureToken increments whenever the TextPane container resizes,
+    // ensuring all rows re-measure when layout shifts (font loading, etc.).
+  }, [containerRef, onMeasure, prop.id, prop.text, remeasureToken]);
 
   return (
     <div
