@@ -1,7 +1,11 @@
 import html2canvas from 'html2canvas';
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+// Wait for the next two paint frames so React DOM updates are committed
+// before html2canvas reads the DOM. More reliable than a fixed ms delay.
+function waitForPaint() {
+  return new Promise((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve))
+  );
 }
 
 export default function ExportPanel({
@@ -22,23 +26,25 @@ export default function ExportPanel({
 
     if (exportLegend && !showLegend) {
       setShowLegend(true);
-      await sleep(120);
+      await waitForPaint();
     }
 
-    const canvas = await html2canvas(workspaceRef.current, {
-      backgroundColor: exportBg === 'transparent' ? null : exportBg,
-      scale: 2,
-      useCORS: true,
-    });
+    try {
+      const canvas = await html2canvas(workspaceRef.current, {
+        backgroundColor: exportBg === 'transparent' ? null : exportBg,
+        scale: 2,
+        useCORS: true,
+      });
 
-    if (exportLegend && !previousShowLegend) {
-      setShowLegend(false);
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'bible-arc.png';
+      link.click();
+    } finally {
+      if (exportLegend && !previousShowLegend) {
+        setShowLegend(false);
+      }
     }
-
-    const link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png');
-    link.download = 'bible-arc.png';
-    link.click();
   };
 
   const preset = ['transparent', '#f8f5ef', '#ffffff', '#171717'].includes(exportBg)
@@ -53,7 +59,9 @@ export default function ExportPanel({
         </label>
         <select
           value={preset}
-          onChange={(e) => setExportBg(e.target.value === 'custom' ? '#d6c7a5' : e.target.value)}
+          onChange={(e) =>
+            setExportBg(e.target.value === 'custom' ? '#d6c7a5' : e.target.value)
+          }
           className="w-full rounded-md border border-stone-600 bg-stone-900 px-3 py-2"
         >
           <option value="transparent">Transparent</option>
@@ -64,15 +72,17 @@ export default function ExportPanel({
         </select>
       </div>
 
-      <label className="block text-xs uppercase tracking-[0.18em] text-stone-400">
-        Custom color
-      </label>
-      <input
-        type="color"
-        value={exportBg === 'transparent' ? '#f8f5ef' : exportBg}
-        onChange={(e) => setExportBg(e.target.value)}
-        className="h-10 w-full rounded-md border border-stone-600 bg-stone-900 p-1"
-      />
+      <div>
+        <label className="mb-1 block text-xs uppercase tracking-[0.18em] text-stone-400">
+          Custom color
+        </label>
+        <input
+          type="color"
+          value={exportBg === 'transparent' ? '#f8f5ef' : exportBg}
+          onChange={(e) => setExportBg(e.target.value)}
+          className="h-10 w-full rounded-md border border-stone-600 bg-stone-900 p-1"
+        />
+      </div>
 
       <label className="flex items-center gap-2">
         <input
@@ -103,13 +113,13 @@ export default function ExportPanel({
       <div className="flex gap-2">
         <button
           onClick={exportPng}
-          className="rounded-md bg-gold px-3 py-2 text-sm font-semibold text-stone-900"
+          className="rounded-md bg-gold px-3 py-2 text-sm font-semibold text-stone-900 hover:opacity-90"
         >
           Export PNG
         </button>
         <button
           onClick={() => window.print()}
-          className="rounded-md border border-stone-500 px-3 py-2 text-sm"
+          className="rounded-md border border-stone-500 px-3 py-2 text-sm hover:bg-stone-800"
         >
           Print / PDF
         </button>

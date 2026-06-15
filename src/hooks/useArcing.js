@@ -1,42 +1,27 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { fetchPassage, fetchTranslations } from './useBible';
 import { CATEGORY_COLORS, REL_BY_CODE } from '../constants/relationships';
+import {
+  propNodeId,
+  bracketNodeId,
+  isPropNode,
+  isBracketNode,
+  numericNodeId,
+  toNodeId,
+  getNodeRange,
+} from '../utils/nodeIds';
 
 const COL_W = 28;
 const LEFT_MARGIN = 4;
 
+// Conjunctions that mark a logical clause boundary. The separator is kept
+// with the *following* proposition so it reads as "for he is good", not
+// "God so loved the world, for".
 const majorSplitPattern =
   /(;|,?\s+(?:and|but|for|because|therefore|so that|in order that|when|before|after|if|unless|although|though|yet|moreover|likewise|then)\s+)/i;
 
 function alphaLabel(index) {
   return 'abcdefghijklmnopqrstuvwxyz'[index] || '';
-}
-
-function propNodeId(propId) {
-  return `p:${propId}`;
-}
-
-function bracketNodeId(bracketId) {
-  return `b:${bracketId}`;
-}
-
-function isPropNode(nodeId) {
-  return String(nodeId).startsWith('p:');
-}
-
-function isBracketNode(nodeId) {
-  return String(nodeId).startsWith('b:');
-}
-
-function numericNodeId(nodeId) {
-  return Number(String(nodeId).split(':')[1]);
-}
-
-function toNodeId(value) {
-  if (typeof value === 'string' && (value.startsWith('p:') || value.startsWith('b:'))) {
-    return value;
-  }
-  return propNodeId(value);
 }
 
 function recomputeSubLabels(props) {
@@ -63,64 +48,6 @@ function parseInitialProps(rawVerses) {
   }));
 }
 
-function getNodeRange(nodeId, propOrderMap, bracketMap, cache = new Map()) {
-  if (cache.has(nodeId)) return cache.get(nodeId);
-
-  if (isPropNode(nodeId)) {
-    const propId = numericNodeId(nodeId);
-    const index = propOrderMap.get(propId) ?? 0;
-    const result = {
-      topIndex: index,
-      bottomIndex: index,
-      startPropId: propId,
-      endPropId: propId,
-    };
-    cache.set(nodeId, result);
-    return result;
-  }
-
-  if (isBracketNode(nodeId)) {
-    const bracketId = numericNodeId(nodeId);
-    const bracket = bracketMap.get(bracketId);
-
-    if (!bracket) {
-      const fallback = {
-        topIndex: 0,
-        bottomIndex: 0,
-        startPropId: null,
-        endPropId: null,
-      };
-      cache.set(nodeId, fallback);
-      return fallback;
-    }
-
-    const fromNode = toNodeId(bracket.fromId ?? bracket.from);
-    const toNode = toNodeId(bracket.toId ?? bracket.to);
-
-    const a = getNodeRange(fromNode, propOrderMap, bracketMap, cache);
-    const b = getNodeRange(toNode, propOrderMap, bracketMap, cache);
-
-    const result = {
-      topIndex: Math.min(a.topIndex, b.topIndex),
-      bottomIndex: Math.max(a.bottomIndex, b.bottomIndex),
-      startPropId: a.topIndex <= b.topIndex ? a.startPropId : b.startPropId,
-      endPropId: a.bottomIndex >= b.bottomIndex ? a.endPropId : b.endPropId,
-    };
-
-    cache.set(nodeId, result);
-    return result;
-  }
-
-  const fallback = {
-    topIndex: 0,
-    bottomIndex: 0,
-    startPropId: null,
-    endPropId: null,
-  };
-  cache.set(nodeId, fallback);
-  return fallback;
-}
-
 function assignBracketColumns(brackets, propOrderMap) {
   const rawBracketMap = new Map(brackets.map((bracket) => [bracket.id, bracket]));
   const rangeCache = new Map();
@@ -143,7 +70,8 @@ function assignBracketColumns(brackets, propOrderMap) {
     let col = 0;
     while (true) {
       const conflict = (columns[col] || []).some(
-        (placed) => !(bracket.bottomIndex < placed.topIndex || bracket.topIndex > placed.bottomIndex)
+        (placed) =>
+          !(bracket.bottomIndex < placed.topIndex || bracket.topIndex > placed.bottomIndex)
       );
       if (!conflict) break;
       col += 1;
@@ -162,27 +90,80 @@ function assignBracketColumns(brackets, propOrderMap) {
   };
 }
 
+function loadSavedWorkspace() {
+  try {
+    const raw = localStorage.getItem('bible-arc-workspace');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
 export function useArcing() {
-  const [props, setProps] = useState([]);
-  const [brackets, setBrackets] = useState([]);
+  const saved = useMemo(loadSavedWorkspace, []);
+
+  const [props, setProps] = useState(() => saved?.props || []);
+  const [brackets, setBrackets] = useState(() => saved?.brackets || []);
   const [selected, setSelected] = useState([]);
   const [splitHistory, setSplitHistory] = useState([]);
-  const [rawVerses, setRawVerses] = useState([]);
-  const [currentRef, setCurrentRef] = useState('');
-  const [translation, setTranslation] = useState(() => localStorage.getItem('bible-translation') || 'ESV');
+  const [rawVerses, setRawVerses] = useState(() => saved?.rawVerses || []);
+  const [currentRef, setCurrentRef] = useState(() => saved?.currentRef || '');
+  const [translation, setTranslation] = useState(
+    () => localStorage.getItem('bible-translation') || 'ESV'
+  );
   const [translations, setTranslations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rowRects, setRowRects] = useState({});
   const [pendingAnchor, setPendingAnchor] = useState(null);
 
-  const nextPropId = useRef(1000);
-  const nextBracketId = useRef(1);
+  // Derive safe starting IDs from saved state to prevent reuse after restore.
+  const savedMaxPropId = useMemo(
+    () => (saved?.props || []).reduce((max, p) => Math.max(max, p.id), 0),
+    []
+  );
+  const savedMaxBracketId = useMemo(
+    () => (saved?.brackets || []).reduce((max, b) => Math.max(max, b.id), 0),
+    []
+  );
 
+  const nextPropId = useRef(Math.max(saved?.nextPropId || 1000, savedMaxPropId + 1));
+  const nextBracketId = useRef(Math.max(saved?.nextBracketId || 1, savedMaxBracketId + 1));
+
+  // Keep refs to latest props/brackets so stable callbacks can read current values
+  // without those values appearing in their dependency arrays (avoiding cascading re-renders).
+  const propsRef = useRef(props);
+  const bracketsRef = useRef(brackets);
+  useEffect(() => { propsRef.current = props; }, [props]);
+  useEffect(() => { bracketsRef.current = brackets; }, [brackets]);
+
+  // Persist translation preference.
   useEffect(() => {
     localStorage.setItem('bible-translation', translation);
   }, [translation]);
 
+  // Persist full workspace state so work survives a page refresh.
+  useEffect(() => {
+    if (!props.length) return;
+    try {
+      localStorage.setItem(
+        'bible-arc-workspace',
+        JSON.stringify({
+          currentRef,
+          props,
+          brackets,
+          rawVerses,
+          nextPropId: nextPropId.current,
+          nextBracketId: nextBracketId.current,
+        })
+      );
+    } catch {
+      // Ignore storage errors (quota exceeded, private browsing, etc.)
+    }
+  }, [currentRef, props, brackets, rawVerses]);
+
+  // Fetch available translation list once on mount.
   useEffect(() => {
     let active = true;
 
@@ -255,6 +236,9 @@ export function useArcing() {
   }, []);
 
   const splitProposition = useCallback((propId, wordIndex) => {
+    // Capture bracket state before the split for undo purposes.
+    const bracketSnapshot = bracketsRef.current.map((b) => ({ ...b }));
+
     setProps((current) => {
       const idx = current.findIndex((prop) => prop.id === propId);
       if (idx === -1) return current;
@@ -263,7 +247,10 @@ export function useArcing() {
       const words = target.text.split(/\s+/).filter(Boolean);
       if (wordIndex <= 0 || wordIndex >= words.length) return current;
 
-      setSplitHistory((prev) => [...prev, current.map((prop) => ({ ...prop }))]);
+      setSplitHistory((prev) => [
+        ...prev,
+        { props: current.map((p) => ({ ...p })), brackets: bracketSnapshot },
+      ]);
 
       const left = words.slice(0, wordIndex).join(' ').trim();
       const right = words.slice(wordIndex).join(' ').trim();
@@ -279,72 +266,88 @@ export function useArcing() {
   }, []);
 
   const mergeWithPrevious = useCallback((propId) => {
-    setProps((current) => {
-      const idx = current.findIndex((prop) => prop.id === propId);
-      if (idx <= 0) return current;
+    const currentProps = propsRef.current;
+    const currentBrackets = bracketsRef.current;
 
-      const currentProp = current[idx];
-      const prevProp = current[idx - 1];
+    const idx = currentProps.findIndex((prop) => prop.id === propId);
+    if (idx <= 0) return;
 
-      if (currentProp.verseNum !== prevProp.verseNum) return current;
+    const currentProp = currentProps[idx];
+    const prevProp = currentProps[idx - 1];
 
-      setSplitHistory((prev) => [...prev, current.map((prop) => ({ ...prop }))]);
+    if (currentProp.verseNum !== prevProp.verseNum) return;
 
-      const mergedProps = [
-        ...current.slice(0, idx - 1),
-        {
-          ...prevProp,
-          text: `${prevProp.text} ${currentProp.text}`.replace(/\s+/g, ' ').trim(),
-        },
-        ...current.slice(idx + 1),
-      ];
+    setSplitHistory((prev) => [
+      ...prev,
+      {
+        props: currentProps.map((p) => ({ ...p })),
+        brackets: currentBrackets.map((b) => ({ ...b })),
+      },
+    ]);
 
-      const removedNode = propNodeId(currentProp.id);
+    const mergedProps = [
+      ...currentProps.slice(0, idx - 1),
+      {
+        ...prevProp,
+        text: `${prevProp.text} ${currentProp.text}`.replace(/\s+/g, ' ').trim(),
+      },
+      ...currentProps.slice(idx + 1),
+    ];
 
-      setBrackets((prev) =>
-        prev.filter((br) => {
-          const fromNode = toNodeId(br.fromId ?? br.from);
-          const toNode = toNodeId(br.toId ?? br.to);
-          return fromNode !== removedNode && toNode !== removedNode;
-        })
-      );
+    const removedNode = propNodeId(currentProp.id);
 
-      setSelected((prev) => prev.filter((id) => id !== removedNode));
-      setPendingAnchor((prev) => (prev === removedNode ? null : prev));
-
-      return recomputeSubLabels(mergedProps);
-    });
+    setProps(recomputeSubLabels(mergedProps));
+    setBrackets((prev) =>
+      prev.filter((br) => {
+        const fromNode = toNodeId(br.fromId ?? br.from);
+        const toNode = toNodeId(br.toId ?? br.to);
+        return fromNode !== removedNode && toNode !== removedNode;
+      })
+    );
+    setSelected((prev) => prev.filter((id) => id !== removedNode));
+    setPendingAnchor((prev) => (prev === removedNode ? null : prev));
   }, []);
 
   const autoSplit = useCallback(() => {
+    const bracketSnapshot = bracketsRef.current.map((b) => ({ ...b }));
+
     setProps((current) => {
-      setSplitHistory((prev) => [...prev, current.map((prop) => ({ ...prop }))]);
+      setSplitHistory((prev) => [
+        ...prev,
+        { props: current.map((p) => ({ ...p })), brackets: bracketSnapshot },
+      ]);
 
       const next = [];
+
       current.forEach((prop) => {
-        const bits = prop.text
-          .split(majorSplitPattern)
-          .map((part) => part?.trim())
-          .filter(Boolean);
+        const raw = prop.text.split(majorSplitPattern);
+        // raw[even] = text segments, raw[odd] = captured separators.
+        // Build propositions putting the separator with the *following* text
+        // so "for he is good" stays together rather than the conjunction
+        // dangling at the end of the preceding proposition.
+        const parts = [];
+        let pendingSep = '';
 
-        if (bits.length <= 1) {
+        for (let i = 0; i < raw.length; i++) {
+          if (i % 2 === 0) {
+            // Text segment — prepend any pending separator, strip leading punctuation.
+            const combined = (pendingSep + (raw[i] || ''))
+              .replace(/^[,;]\s*/, '')
+              .trim();
+            pendingSep = '';
+            if (combined) parts.push(combined);
+          } else {
+            // Separator — hold for next text segment.
+            pendingSep = raw[i] || '';
+          }
+        }
+
+        if (parts.length <= 1) {
           next.push(prop);
           return;
         }
 
-        const merged = [];
-        for (let i = 0; i < bits.length; i += 2) {
-          const first = bits[i] || '';
-          const second = bits[i + 1] || '';
-          merged.push(`${first}${second}`.trim());
-        }
-
-        if (merged.length <= 1) {
-          next.push(prop);
-          return;
-        }
-
-        merged.forEach((text, index) => {
+        parts.forEach((text, index) => {
           next.push({
             ...prop,
             id: index === 0 ? prop.id : nextPropId.current++,
@@ -370,8 +373,19 @@ export function useArcing() {
   const undoSplit = useCallback(() => {
     setSplitHistory((prev) => {
       if (!prev.length) return prev;
-      const restored = prev[prev.length - 1];
-      setProps(restored);
+      const lastEntry = prev[prev.length - 1];
+
+      if (lastEntry && typeof lastEntry === 'object' && !Array.isArray(lastEntry)) {
+        // New format: { props, brackets }
+        setProps(lastEntry.props);
+        if (lastEntry.brackets !== null) {
+          setBrackets(lastEntry.brackets);
+        }
+      } else {
+        // Legacy format: plain props array (backward compatibility)
+        setProps(lastEntry);
+      }
+
       return prev.slice(0, -1);
     });
   }, []);
@@ -390,8 +404,7 @@ export function useArcing() {
         const a = toNodeId(br.fromId ?? br.from);
         const b = toNodeId(br.toId ?? br.to);
         return (
-          ((a === fromId && b === toId) || (a === toId && b === fromId)) &&
-          br.code === code
+          ((a === fromId && b === toId) || (a === toId && b === fromId)) && br.code === code
         );
       });
 
@@ -421,11 +434,7 @@ export function useArcing() {
         if (bracket.id !== bracketId) return bracket;
         const code = updates.code || bracket.code;
         const rel = REL_BY_CODE[code];
-        return {
-          ...bracket,
-          ...updates,
-          color: CATEGORY_COLORS[rel.category],
-        };
+        return { ...bracket, ...updates, color: CATEGORY_COLORS[rel.category] };
       })
     );
   }, []);
@@ -437,16 +446,34 @@ export function useArcing() {
   }, []);
 
   const deleteBracket = useCallback((bracketId) => {
-    const removedNode = bracketNodeId(bracketId);
-    setBrackets((prev) =>
-      prev.filter((br) => {
-        const fromNode = toNodeId(br.fromId ?? br.from);
-        const toNode = toNodeId(br.toId ?? br.to);
-        return br.id !== bracketId && fromNode !== removedNode && toNode !== removedNode;
-      })
-    );
-    setSelected((prev) => prev.filter((id) => id !== removedNode));
-    setPendingAnchor((prev) => (prev === removedNode ? null : prev));
+    setBrackets((prev) => {
+      // Collect all bracket IDs to remove, cascading through nested references.
+      const idsToRemove = new Set([bracketId]);
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (const br of prev) {
+          if (idsToRemove.has(br.id)) continue;
+          const fromNode = toNodeId(br.fromId ?? br.from);
+          const toNode = toNodeId(br.toId ?? br.to);
+          const fromBrId = isBracketNode(fromNode) ? numericNodeId(fromNode) : null;
+          const toBrId = isBracketNode(toNode) ? numericNodeId(toNode) : null;
+          if (
+            (fromBrId !== null && idsToRemove.has(fromBrId)) ||
+            (toBrId !== null && idsToRemove.has(toBrId))
+          ) {
+            idsToRemove.add(br.id);
+            changed = true;
+          }
+        }
+      }
+
+      const removedNodes = new Set([...idsToRemove].map(bracketNodeId));
+      setSelected((s) => s.filter((id) => !removedNodes.has(id)));
+      setPendingAnchor((p) => (p !== null && removedNodes.has(p) ? null : p));
+
+      return prev.filter((br) => !idsToRemove.has(br.id));
+    });
   }, []);
 
   const rowAnchors = useMemo(
@@ -478,11 +505,9 @@ export function useArcing() {
           y: (rect?.top ?? 0) + (rect?.height ?? 0) / 2,
         };
       }
-
       if (isBracketNode(nodeId)) {
         return anchorMap.get(nodeId) || { x: 0, y: 0 };
       }
-
       return { x: 0, y: 0 };
     };
 
@@ -501,11 +526,7 @@ export function useArcing() {
 
       const range = getNodeRange(bracketNodeId(raw.id), propOrderMap, rawBracketMap, rangeCache);
 
-      const anchor = {
-        x: stemX,
-        y: (yTop + yBottom) / 2,
-      };
-
+      const anchor = { x: stemX, y: (yTop + yBottom) / 2 };
       anchorMap.set(bracketNodeId(raw.id), anchor);
 
       derived.push({

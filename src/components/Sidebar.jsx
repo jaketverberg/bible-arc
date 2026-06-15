@@ -19,6 +19,7 @@ export default function Sidebar({
   onUndoSplit,
   onAutoSplit,
   onResetSplits,
+  hasSplitHistory,
   workspaceRef,
   exportBg,
   setExportBg,
@@ -56,22 +57,23 @@ export default function Sidebar({
         <div className="flex flex-wrap gap-2">
           <button
             onClick={onUndoSplit}
-            className="rounded-md border border-stone-600 px-2 py-2 text-xs"
-            title="Undo last split"
+            disabled={!hasSplitHistory}
+            className="rounded-md border border-stone-600 px-2 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-40"
+            title="Undo last split or merge"
           >
             Undo
           </button>
           <button
             onClick={onAutoSplit}
             className="rounded-md border border-stone-600 px-2 py-2 text-xs"
-            title="Auto-split"
+            title="Auto-split on conjunctions"
           >
             Auto
           </button>
           <button
             onClick={onResetSplits}
             className="rounded-md border border-stone-600 px-2 py-2 text-xs"
-            title="Reset splits"
+            title="Reset all splits and brackets"
           >
             Reset
           </button>
@@ -81,9 +83,6 @@ export default function Sidebar({
       <section>
         <div className="mb-2 text-xs uppercase tracking-[0.18em] text-stone-400">Relationships</div>
         <RelationshipPalette selectedCount={selected.length} onApply={onApplyRelation} />
-        <p className="mt-2 text-xs text-stone-400">
-          To apply Ground or Inference to a single verse&apos;s content, split the verse first.
-        </p>
       </section>
 
       <section className="min-h-0 flex-1">
@@ -140,7 +139,12 @@ export default function Sidebar({
         >
           {mobileOpen ? 'Close tools' : 'Open tools'}
         </button>
-        {mobileOpen && <div className="fixed inset-0 z-40 bg-black/35" onClick={() => setMobileOpen(false)} />}
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/35"
+            onClick={() => setMobileOpen(false)}
+          />
+        )}
         <aside
           className={`fixed inset-x-0 bottom-0 z-50 max-h-[88vh] rounded-t-2xl bg-sidebar text-stone-100 shadow-2xl transition-transform ${
             mobileOpen ? 'translate-y-0' : 'translate-y-full'

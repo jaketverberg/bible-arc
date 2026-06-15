@@ -34,6 +34,7 @@ function WorkspacePage() {
         onUndoSplit={arcing.undoSplit}
         onAutoSplit={arcing.autoSplit}
         onResetSplits={arcing.resetSplits}
+        hasSplitHistory={arcing.splitHistory.length > 0}
         workspaceRef={workspaceRef}
         exportBg={exportBg}
         setExportBg={setExportBg}
@@ -62,44 +63,55 @@ function WorkspacePage() {
           </div>
         )}
 
-        <div ref={workspaceRef} style={{ background: exportBg }} className="overflow-x-auto">
-          <div className="flex min-w-full items-start">
-            <BracketPane
-              brackets={arcing.derivedBrackets}
-              paneWidth={arcing.workspaceReady ? arcing.bracketLayout.paneWidth : 60}
-              paneHeight={textPaneHeight}
-              onUpdate={arcing.updateBracket}
-              onDelete={arcing.deleteBracket}
-              onFlip={arcing.flipBracket}
-              rowAnchors={arcing.rowAnchors}
-              bracketAnchors={arcing.bracketAnchors}
-              pendingAnchor={arcing.pendingAnchor}
-              onAnchorClick={arcing.handleAnchorClick}
+        {arcing.loading && (
+          <div className="flex items-center justify-center gap-3 py-20 text-stone-500">
+            <span
+              className="h-7 w-7 animate-spin rounded-full border-2 border-stone-300"
+              style={{ borderTopColor: '#b8963e' }}
             />
-
-            <TextPane
-              props={arcing.props}
-              selected={arcing.selected}
-              onMeasure={arcing.setRowMeasurement}
-              onSplit={arcing.splitProposition}
-              onMerge={arcing.mergeWithPrevious}
-            />
+            <span className="text-sm">Loading passage…</span>
           </div>
+        )}
 
-          {showLegend && (
-            <div className="p-4">
-              <Legend />
-            </div>
-          )}
+        {!arcing.loading && (
+          <div ref={workspaceRef} style={{ background: exportBg }} className="overflow-x-auto">
+            <div className="flex min-w-full items-start">
+              <BracketPane
+                brackets={arcing.derivedBrackets}
+                paneWidth={arcing.workspaceReady ? arcing.bracketLayout.paneWidth : 60}
+                paneHeight={textPaneHeight}
+                onUpdate={arcing.updateBracket}
+                onDelete={arcing.deleteBracket}
+                onFlip={arcing.flipBracket}
+                rowAnchors={arcing.rowAnchors}
+                bracketAnchors={arcing.bracketAnchors}
+                pendingAnchor={arcing.pendingAnchor}
+                onAnchorClick={arcing.handleAnchorClick}
+              />
 
-          {printLegend && !showLegend && (
-            <div className="hidden print:block p-4">
-              <Legend />
+              <TextPane
+                props={arcing.props}
+                selected={arcing.selected}
+                onMeasure={arcing.setRowMeasurement}
+                onSplit={arcing.splitProposition}
+                onMerge={arcing.mergeWithPrevious}
+              />
             </div>
-          )}
-        </div>
+
+            {showLegend && (
+              <div className="p-4">
+                <Legend />
+              </div>
+            )}
+
+            {printLegend && !showLegend && (
+              <div className="hidden p-4 print:block">
+                <Legend />
+              </div>
+            )}
+          </div>
+        )}
       </main>
-
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { REL_BY_CODE, REL_GROUPS } from '../constants/relationships';
 
 export default function BracketPane({
@@ -14,7 +14,42 @@ export default function BracketPane({
   onAnchorClick,
 }) {
   const [activeId, setActiveId] = useState(null);
-  const active = useMemo(() => brackets.find((br) => br.id === activeId) || null, [brackets, activeId]);
+  const paneDivRef = useRef(null);
+
+  const active = useMemo(
+    () => brackets.find((br) => br.id === activeId) || null,
+    [brackets, activeId]
+  );
+
+  // Auto-close popover when the active bracket is deleted.
+  useEffect(() => {
+    if (activeId !== null && !brackets.find((br) => br.id === activeId)) {
+      setActiveId(null);
+    }
+  }, [brackets, activeId]);
+
+  // Close popover on Escape key.
+  useEffect(() => {
+    if (!activeId) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setActiveId(null);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [activeId]);
+
+  // Close popover when clicking outside the bracket pane.
+  useEffect(() => {
+    if (!activeId) return;
+    const handleClickOutside = (e) => {
+      if (paneDivRef.current && !paneDivRef.current.contains(e.target)) {
+        setActiveId(null);
+      }
+    };
+    // Use capture phase so this fires before bubbling stops it.
+    document.addEventListener('mousedown', handleClickOutside, true);
+    return () => document.removeEventListener('mousedown', handleClickOutside, true);
+  }, [activeId]);
 
   const findOverlapX = (target, isTop) => {
     const currentY = isTop ? target.yTop : target.yBottom;
@@ -30,19 +65,28 @@ export default function BracketPane({
     return inner ? inner.stemX : paneWidth - 10;
   };
 
-  const popoverStyle = active
-    ? {
-        left: Math.max(8, Math.min((active.stemX || 24) + 18, paneWidth - 260)),
-        top: Math.max(8, (active.anchorY || 0) - 36),
-      }
-    : null;
+  // Position the popover to the right of the stem, clamped so it never
+  // clips off the right edge of the viewport.
+  const popoverLeft = active
+    ? Math.max(8, (active.stemX || 24) + 18)
+    : 0;
+  const popoverTop = active
+    ? Math.max(8, (active.anchorY || 0) - 36)
+    : 0;
 
   return (
     <div
+      ref={paneDivRef}
       className="relative border-r border-stone-300 bg-paper/70"
       style={{ width: paneWidth, minWidth: paneWidth }}
     >
-      <svg width={paneWidth} height={Math.max(paneHeight, 200)} className="overflow-visible">
+      <svg
+        width={paneWidth}
+        height={Math.max(paneHeight, 200)}
+        className="overflow-visible"
+        aria-hidden="true"
+      >
+        {/* Row anchors — one per proposition */}
         {rowAnchors.map((anchor) => {
           const isPending = pendingAnchor === anchor.id;
           return (
@@ -55,49 +99,60 @@ export default function BracketPane({
               opacity={isPending ? 0.95 : 0.6}
               className="cursor-pointer transition hover:opacity-100"
               onClick={() => onAnchorClick?.(anchor.id)}
+              role="button"
+              aria-label="Select proposition anchor"
             />
           );
         })}
 
+        {/* Bracket lines and labels */}
         {brackets.map((bracket) => {
           const topX2 = findOverlapX(bracket, true);
           const bottomX2 = findOverlapX(bracket, false);
           const rel = REL_BY_CODE[bracket.code];
+          if (!rel) return null;
           const labels = bracket.flipped ? [...rel.labels].reverse() : rel.labels;
           const topLabelX = (bracket.stemX + topX2) / 2;
           const bottomLabelX = (bracket.stemX + bottomX2) / 2;
+          const isActive = bracket.id === activeId;
 
           return (
-            <g key={bracket.id}>
+            <g key={bracket.id} className="cursor-pointer" onClick={() => setActiveId(bracket.id)}>
+              {/* Invisible wide hit area on the stem for easier clicking */}
+              <line
+                x1={bracket.stemX}
+                y1={bracket.yTop}
+                x2={bracket.stemX}
+                y2={bracket.yBottom}
+                stroke="transparent"
+                strokeWidth="10"
+              />
+              {/* Visible stem */}
               <line
                 x1={bracket.stemX}
                 y1={bracket.yTop}
                 x2={bracket.stemX}
                 y2={bracket.yBottom}
                 stroke={bracket.color}
-                strokeWidth="2"
-                className="cursor-pointer"
-                onClick={() => setActiveId(bracket.id)}
+                strokeWidth={isActive ? 2.5 : 2}
               />
+              {/* Top arm */}
               <line
                 x1={bracket.stemX}
                 y1={bracket.yTop}
                 x2={topX2}
                 y2={bracket.yTop}
                 stroke={bracket.color}
-                strokeWidth="2"
-                className="cursor-pointer"
-                onClick={() => setActiveId(bracket.id)}
+                strokeWidth={isActive ? 2.5 : 2}
               />
+              {/* Bottom arm */}
               <line
                 x1={bracket.stemX}
                 y1={bracket.yBottom}
                 x2={bottomX2}
                 y2={bracket.yBottom}
                 stroke={bracket.color}
-                strokeWidth="2"
-                className="cursor-pointer"
-                onClick={() => setActiveId(bracket.id)}
+                strokeWidth={isActive ? 2.5 : 2}
               />
 
               <text
@@ -107,8 +162,6 @@ export default function BracketPane({
                 fontSize="11"
                 fontWeight="600"
                 fill={bracket.color}
-                className="cursor-pointer"
-                onClick={() => setActiveId(bracket.id)}
               >
                 {labels[0]}
               </text>
@@ -121,8 +174,6 @@ export default function BracketPane({
                   fontSize="11"
                   fontWeight="600"
                   fill={bracket.color}
-                  className="cursor-pointer"
-                  onClick={() => setActiveId(bracket.id)}
                 >
                   {labels[1]}
                 </text>
@@ -131,6 +182,7 @@ export default function BracketPane({
           );
         })}
 
+        {/* Bracket anchors — for nested bracket connections */}
         {bracketAnchors.map((anchor) => {
           const isPending = pendingAnchor === anchor.id;
           return (
@@ -146,21 +198,25 @@ export default function BracketPane({
                 e.stopPropagation();
                 onAnchorClick?.(anchor.id);
               }}
+              role="button"
+              aria-label="Select bracket anchor"
             />
           );
         })}
 
+        {/* Delete button on active bracket */}
         {active && (
-          <g transform={`translate(${active.stemX - 8}, ${active.yTop - 10})`}>
-            <circle
-              cx="0"
-              cy="0"
-              r="8"
-              fill="#ffffff"
-              stroke="#7c2d12"
-              className="cursor-pointer"
-              onClick={() => onDelete(active.id)}
-            />
+          <g
+            transform={`translate(${active.stemX - 8}, ${active.yTop - 10})`}
+            className="cursor-pointer"
+            onClick={() => {
+              onDelete(active.id);
+              setActiveId(null);
+            }}
+            role="button"
+            aria-label="Delete bracket"
+          >
+            <circle cx="0" cy="0" r="8" fill="#ffffff" stroke="#7c2d12" />
             <text x="0" y="4" textAnchor="middle" fontSize="12" fill="#7c2d12">
               ×
             </text>
@@ -168,14 +224,19 @@ export default function BracketPane({
         )}
       </svg>
 
-      {active && popoverStyle && (
+      {/* Edit popover — renders inside the pane div so it inherits z-index stacking */}
+      {active && (
         <div
           className="absolute z-20 w-64 rounded-lg border border-stone-300 bg-white p-3 shadow-xl"
-          style={popoverStyle}
+          style={{ left: popoverLeft, top: popoverTop }}
         >
           <div className="mb-2 flex items-center justify-between">
-            <div className="font-semibold">Edit bracket</div>
-            <button onClick={() => setActiveId(null)} className="text-stone-500">
+            <div className="text-sm font-semibold text-stone-800">Edit bracket</div>
+            <button
+              onClick={() => setActiveId(null)}
+              className="text-stone-400 hover:text-stone-700"
+              aria-label="Close"
+            >
               ×
             </button>
           </div>
@@ -183,20 +244,24 @@ export default function BracketPane({
           <div className="max-h-72 space-y-2 overflow-auto pr-1">
             {REL_GROUPS.map((group) => (
               <div key={group.category}>
-                <div className="mb-1 text-xs uppercase tracking-[0.18em] text-stone-500">
+                <div className="mb-1 text-xs uppercase tracking-[0.18em] text-stone-400">
                   {group.category}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {group.items.map((item) => (
                     <button
                       key={item.code}
-                      onClick={() => onUpdate(active.id, { code: item.code })}
-                      className="rounded-full border px-2 py-1 text-xs"
+                      onClick={() => {
+                        onUpdate(active.id, { code: item.code });
+                        setActiveId(null);
+                      }}
+                      className="rounded-full border px-2 py-1 text-xs transition hover:opacity-80"
                       style={{
                         borderColor: group.color,
                         color: group.color,
                         background: `${group.color}18`,
                       }}
+                      title={`${item.name} — ${item.conjunctions}`}
                     >
                       {item.code}
                     </button>
@@ -206,18 +271,21 @@ export default function BracketPane({
             ))}
           </div>
 
-          <div className="mt-3 flex gap-2">
-            {REL_BY_CODE[active.code].flippable && (
+          <div className="mt-3 flex gap-2 border-t border-stone-100 pt-3">
+            {REL_BY_CODE[active.code]?.flippable && (
               <button
                 onClick={() => onFlip(active.id)}
-                className="rounded border px-2 py-1 text-xs"
+                className="rounded border border-stone-300 px-2 py-1 text-xs text-stone-700 hover:bg-stone-50"
               >
                 Flip direction
               </button>
             )}
             <button
-              onClick={() => onDelete(active.id)}
-              className="rounded border px-2 py-1 text-xs"
+              onClick={() => {
+                onDelete(active.id);
+                setActiveId(null);
+              }}
+              className="rounded border border-red-200 px-2 py-1 text-xs text-red-700 hover:bg-red-50"
             >
               Delete
             </button>
